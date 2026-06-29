@@ -40,6 +40,16 @@ import org.springframework.util.CollectionUtils;
 import java.util.Arrays;
 import java.util.Map;
 
+/**
+ * Agent ChatClient Bean 配置类，负责为 DeepResearch 工作流中各节点创建对应的 {@code ChatClient} Bean。
+ *
+ * <p>项目职责：属于配置层，依托 {@code AgentModelsConfiguration} 动态注册的 {@code ChatClient.Builder}，
+ * 为 backgroundAgent、researchAgent、coderAgent、plannerAgent、reporterAgent 等所有 Agent 装配提示词、
+ * 工具回调（MCP/本地 Tool）并构建 ChatClient，供图节点层（node/）在执行时直接调用。
+ *
+ * <p>被使用情况：由 Spring 容器直接管理，各 {@code ChatClient} Bean 被
+ * {@code DeepResearchConfiguration} 及各图节点类通过 {@code @Autowired} 注入使用。
+ */
 @Configuration
 public class AgentsConfiguration {
 

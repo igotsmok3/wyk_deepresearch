@@ -17,10 +17,18 @@
 package com.alibaba.cloud.ai.example.deepresearch.model.enums;
 
 /**
+ * 并行节点类型枚举，定义可动态扩展的并行 Agent 角色（研究员和编程员）。
+ *
+ * <p>项目职责：枚举值作为节点名前缀，配合并行节点数量配置动态生成
+ * {@code researcher_N} 和 {@code coder_N} 节点，驱动图的并行执行结构。
+ *
+ * <p>被使用情况：{@code DeepResearchConfiguration} 根据该枚举遍历配置动态注册并行节点；
+ * {@code ParallelExecutorNode} 按步骤类型分配任务到对应并行节点；
+ * {@code ReporterNode} 聚合并行节点产出内容。
+ *
  * @author yingzi
  * @since 2025/6/14
  */
-
 public enum ParallelEnum {
 
 	RESEARCHER("researcher"), CODER("coder");

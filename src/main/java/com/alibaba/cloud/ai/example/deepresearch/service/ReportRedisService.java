@@ -25,7 +25,16 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 报告 Redis 服务类
+ * {@link ReportService} 的 Redis 实现，在 Redis 开启时作为报告的持久化存储方案。
+ *
+ * <p>项目职责：使用 {@code RedisTemplate} 以 {@code deepresearch:report:<threadId>} 为键
+ * 存储报告内容，默认设置 24 小时 TTL，支持跨进程重启的报告保留能力；
+ * 提供保存、读取、存在性检查和删除四类操作。
+ *
+ * <p>被使用情况：实现 {@link ReportService} 接口，在 {@code spring.data.redis.enabled=true} 时
+ * 由 Spring 自动装配替换内存实现；被 {@code ReporterNode} 写入报告、被
+ * {@code ExportService}、{@code InMemorySessionContextService} 读取报告、
+ * 被 {@code ReportController} 查询和删除报告。
  *
  * @author huangzhen
  * @since 2025/6/18

@@ -25,7 +25,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 基于内存的报告服务类（当Redis不可用时使用）
+ * {@link ReportService} 的纯内存实现，在 Redis 不可用时作为报告存储的默认方案。
+ *
+ * <p>项目职责：使用 {@code ConcurrentHashMap} 以 threadId 为键存储报告内容，
+ * 提供保存、读取、存在性检查和删除四类操作，保证多线程并发安全。
+ * 报告内容仅驻留内存，应用重启后丢失。
+ *
+ * <p>被使用情况：实现 {@link ReportService} 接口，在 {@code spring.data.redis.enabled=false}
+ * （默认值）时由 Spring 自动装配；被 {@code ReporterNode} 写入报告、被
+ * {@code ExportService}、{@code InMemorySessionContextService} 读取报告、
+ * 被 {@code ReportController} 查询和删除报告。
  *
  * @author huangzhen
  * @since 2025/6/20

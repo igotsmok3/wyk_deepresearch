@@ -24,7 +24,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Agent分派结果
+ * 智能 Agent 分派结果，封装问题分类后选定的 Agent 实例、类型、搜索平台及执行状态。
+ *
+ * <p>项目职责：由 {@code SmartAgentDispatcherService} 在完成问题分类和搜索平台选择后返回，
+ * 作为中间结果向上层传递 Agent 分派决策，包含失败时的错误信息和状态更新 Map。
+ *
+ * <p>被使用情况：{@code SmartAgentDispatcherService} 构建并返回该对象；
+ * {@code SmartAgentSelectionHelperService} 消费该结果构建 {@code AgentSelectionResult}。
  *
  * @author Makoto
  * @since 2025/07/17

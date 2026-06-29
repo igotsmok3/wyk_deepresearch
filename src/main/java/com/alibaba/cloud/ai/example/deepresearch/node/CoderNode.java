@@ -43,10 +43,19 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
+ * 编码执行节点：并行研究团队中负责处理 PROCESSING 类型步骤（代码生成/数据处理）的执行者。
+ *
+ * <p>项目职责：从 OverAllState 的 {@code current_plan} 中找到分配给自己（{@code coder_N}）且待执行的
+ * PROCESSING 步骤，调用 coderAgent 流式生成代码结果。支持 Reflection 机制：步骤完成后可触发质量评估，
+ * 评估未通过则重新执行。写入 OverAllState 的 {@code coder_content_{N}} 键（流式 Flux）。
+ * 使用 MCP 工厂按需注入工具回调。
+ *
+ * <p>被使用情况：由 {@code DeepResearchConfiguration#addCoderNodes} 根据配置动态注册多个实例
+ * （{@code coder_0}、{@code coder_1} 等）；{@code ReflectionProcessor} 以同一实例注入所有 CoderNode。
+ *
  * @author sixiyida
  * @since 2025/6/14 11:17
  */
-
 public class CoderNode implements NodeAction {
 
 	private static final Logger logger = LoggerFactory.getLogger(CoderNode.class);
@@ -85,7 +94,9 @@ public class CoderNode implements NodeAction {
 			return updated;
 		}
 
-		// Handle reflection logic
+		// Reflection 前置拦截（逻辑与 ResearcherNode 相同）：
+		// - waiting_reflecting：触发评估，本次跳过执行
+		// - waiting_processing：清空旧结果，继续重新执行
 		if (reflectionProcessor != null) {
 			ReflectionProcessor.ReflectionHandleResult reflectionResult = reflectionProcessor
 				.handleReflection(assignedStep, nodeName, "coder");
@@ -136,6 +147,7 @@ public class CoderNode implements NodeAction {
 				.mapResult(response -> {
 					// Only handle successful responses - errors are handled in doOnError
 					String coderContent = response.getResult().getOutput().getText();
+					// Reflection 启用：设为 waiting_reflecting 等待评估；否则直接 completed
 					assignedStep
 						.setExecutionStatus(ReflectionUtil.getCompletionStatus(reflectionProcessor != null, nodeName));
 					assignedStep.setExecutionRes(Objects.requireNonNull(coderContent));

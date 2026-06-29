@@ -21,6 +21,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 
 /**
+ * 图任务唯一标识，由会话 ID 和线程 ID 联合组成，用于在并发场景中定位特定的图执行实例。
+ *
+ * <p>项目职责：作为图任务的复合键，在 {@code GraphProcess} 的任务 Map 中作索引，
+ * 同时在各节点、会话历史存储中传递，关联一次完整的研究会话与线程。
+ *
+ * <p>被使用情况：{@code GraphProcess} 以该记录为 Map 键管理任务 Future；
+ * {@code ChatController} 创建并传递 GraphId；{@code ReporterNode} 构建 GraphId 并存储会话历史；
+ * {@code SessionHistory} 持有 GraphId 标识所属会话；测试类 {@code GraphProcessExceptionHandlingTest}
+ * 使用该记录验证图任务异常处理逻辑。
+ *
  * @author vlsmb
  * @since 2025/8/6
  */

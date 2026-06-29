@@ -28,17 +28,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This repository class is responsible for loading agent model parameters from a JSON
- * configuration file. It reads the models defined in the "model-config.json" file and
- * provides methods to access them.
+ * {@link ModelParamRepository} 的默认实现，在启动时从 classpath 的 {@code model-config.json} 加载 Agent 模型配置。
  *
- * The JSON structure is expected to have a key "models" which maps to a list of
- * AgentModel objects.
+ * <p>项目职责：读取 JSON 文件中 {@code models} 数组，将每个条目映射为 {@code AgentModel} Record（name + modelName），
+ * 供 {@code AgentModelsConfiguration} 在 Spring 容器初始化阶段动态注册各 Agent 对应的 ChatModel Bean。
+ *
+ * <p>被使用情况：{@code AgentModelsConfiguration} 通过 {@code ModelParamRepository} 接口注入本类，
+ * 调用 {@code loadModels()} 获取模型列表后按名称注册 ChatModel Bean 到 BeanFactory。
  *
  * @author ViliamSun
  * @since 0.1.0
  */
-
 @Repository
 public class ModelParamRepositoryImpl implements ModelParamRepository {
 

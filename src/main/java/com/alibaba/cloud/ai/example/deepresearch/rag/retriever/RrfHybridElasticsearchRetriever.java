@@ -38,9 +38,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Hybrid Elasticsearch retriever using BM25 and KNN search with Reciprocal Rank Fusion.
- * SimilaritySearch reference
- * {@link org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore}
+ * 基于 Elasticsearch 的混合检索器，同时执行 BM25 关键词检索和 KNN 向量检索，并用 RRF 算法融合排序。
+ *
+ * <p>项目职责：RAG 检索层的核心实现，向 ES 发送混合查询（BM25 + KNN + RRF）或纯 KNN 查询，
+ * 支持通过 filterExpression 按 source_type / session_id / user_id 对结果进行隔离过滤。
+ *
+ * <p>被使用情况：由 DefaultHybridRagProcessor 在 Elasticsearch 混合模式开启时实例化，
+ * 作为 hybridRetrieve 阶段的检索后端；当 ES 或 hybrid 未启用时降级为向量存储直接检索。
  *
  * @author hupei
  * @author ViliamSun
@@ -126,22 +130,21 @@ public class RrfHybridElasticsearchRetriever implements DocumentRetriever {
 	}
 
 	/**
-	 * Query unified entry, default search based on knn method
-	 * @param text the query text to search for
-	 * @param hasHybrid whether to enable hybrid search (based on query statement and rank
-	 * query)
+	 * 核心检索入口：将查询文本向量化，构建 ES 搜索请求。
+	 * hasHybrid=false 时仅 KNN 向量检索；hasHybrid=true 时 KNN + BM25 + RRF 混合。
 	 */
 	public List<Document> search(String text, boolean hasHybrid,
 			co.elastic.clients.elasticsearch._types.query_dsl.Query filter) throws IOException {
+		// 将查询文本向量化，float[] → List<Float> 供 ES KNN 查询使用
 		float[] vector = embeddingModel.embed(text);
 		SearchResponse<Document> response = elasticsearchClient.search(sr -> {
 			Builder knnBuilder = sr.index(indexName)
-				.postFilter(filter)
+				.postFilter(filter) // 先召回后过滤（postFilter 不影响 KNN 评分）
 				.knn(knn -> knn.queryVector(EmbeddingUtils.toList(vector))
-					.similarity(0.0f)
-					.k(windowSize)
+					.similarity(0.0f)       // 不做相似度阈值过滤，由 RRF 统一处理
+					.k(windowSize)          // 返回 top-k 个向量近邻
 					.field("embedding")
-					.numCandidates(Math.max(windowSize * 2, 10))
+					.numCandidates(Math.max(windowSize * 2, 10)) // 候选池=k*2，提升召回精度
 					.boost(knnBoost));
 			if (hasHybrid) {
 				return buildHybridSearch(text, knnBuilder);
@@ -157,6 +160,7 @@ public class RrfHybridElasticsearchRetriever implements DocumentRetriever {
 		Document.Builder documentBuilder = document != null ? document.mutate() : new Document.Builder();
 		Double score = hit.score();
 		if (score != null) {
+			// ES RRF 分数归一化到 [0,1] 区间存入元数据
 			documentBuilder.metadata(DocumentMetadata.DISTANCE.value(), 1 - (2 * score) - 1);
 			documentBuilder.score((2 * score) - 1);
 		}
@@ -164,7 +168,7 @@ public class RrfHybridElasticsearchRetriever implements DocumentRetriever {
 	}
 
 	private Builder buildHybridSearch(String text, Builder knnBuilder) {
-		// Build the hybrid search request with BM25 and rrf
+		// 在 KNN 基础上叠加 BM25 match 查询，通过 rank.rrf 让 ES 内置 RRF 融合两路结果
 		return knnBuilder.query(q -> q.match(mq -> mq.field("content").query(escape(text)).boost(bm25Boost)))
 			.rank(r -> r.rrf(rrfk -> rrfk.rankConstant((long) rrfK).rankWindowSize((long) windowSize)));
 	}

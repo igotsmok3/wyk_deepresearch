@@ -37,8 +37,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
- * A service for ingesting data into the vector store from various sources. It handles
- * document reading, splitting, and vectorization.
+ * 文档摄入服务，将各类来源的文档解析、切分、元数据富化后写入向量数据库。
+ *
+ * <p>项目职责：支持三类数据来源——用户上传（携带 session_id、user_id，检索时按会话隔离）、
+ * 专业知识库 ES（携带 kb_id、kb_name，session_id 固定为 "professional_kb_es"）和
+ * 系统初始化（启动或定时扫描自动摄入）。摄入流程固定为：
+ * TikaDocumentReader（多格式解析）→ TokenTextSplitter（分块）→ 元数据富化 → VectorStore.add()。
+ * 文本分块参数通过 {@code RagProperties.TextSplitter} 配置化控制。
+ *
+ * <p>被使用情况：被 {@code RagDataController} 注入，响应用户文件上传和专业知识库文档入库请求；
+ * 被 {@code RagDataAutoConfiguration} 在应用启动时自动摄入系统默认文档；
+ * {@code DefaultHybridRagProcessor}、{@code UserFileRetrievalStrategy} 等检索组件与本类的
+ * 元数据字段约定保持一致，实现数据隔离与过滤。
  *
  * @author hupei
  */

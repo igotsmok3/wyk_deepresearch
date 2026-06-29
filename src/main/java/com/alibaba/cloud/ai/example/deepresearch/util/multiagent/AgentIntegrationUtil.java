@@ -25,7 +25,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Agent集成工具类 统一处理智能Agent的集成逻辑，提供智能Agent选择、错误处理等功能
+ * 智能 Agent 集成工具类，提供 SmartAgent 可用性检查与 {@code SmartAgentSelectionHelperService} 实例创建能力。
+ *
+ * <p>项目职责：封装智能 Agent 子系统的可用性判断（Feature Flag 开关 + 必要服务注入检查）
+ * 以及选择器辅助服务的统一创建，简化各节点中的重复集成代码。
+ *
+ * <p>被使用情况：{@code ResearcherNode} 和 {@code BackgroundInvestigationNode} 在构造期间
+ * 调用 {@code createSelectionHelper} 初始化智能 Agent 选择器；
+ * {@code SmartAgentSelectionHelperService} 调用 {@code isSmartAgentAvailable} 进行前置校验。
  *
  * @author Makoto
  * @since 2025/07/17

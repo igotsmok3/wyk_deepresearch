@@ -24,22 +24,38 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * 图全局状态访问工具类，封装 {@code OverAllState} 中常用字段的读取方法和 Step 执行状态常量。
+ *
+ * <p>项目职责：集中定义 Step 执行状态前缀常量（assigned/processing/completed/waiting_reflecting 等），
+ * 并提供 query、plan、thread_id、session_id、plan_iterations 等常用状态字段的类型安全读取方法，
+ * 以及统一的 Step 错误处理逻辑，减少各节点对状态键字符串的硬编码依赖。
+ *
+ * <p>被使用情况：几乎所有图节点（CoordinatorNode、PlannerNode、ResearcherNode、CoderNode、
+ * ReporterNode、ParallelExecutorNode、BackgroundInvestigationNode 等）均通过本类读取状态字段；
+ * {@code ReflectionUtil} 引用本类的状态前缀常量判断 Step 执行状态。
+ *
  * @author yingzi
  * @since 2025/6/9
  */
-
 public class StateUtil {
 
+	// Step 执行状态前缀，格式均为 "<prefix><nodeName>"
+	/** 已由 planner 分配给某节点，等待首次执行 */
 	public static final String EXECUTION_STATUS_ASSIGNED_PREFIX = "assigned_";
 
+	/** 节点正在执行中 */
 	public static final String EXECUTION_STATUS_PROCESSING_PREFIX = "processing_";
 
+	/** 执行完成（Reflection 未启用，或评估通过） */
 	public static final String EXECUTION_STATUS_COMPLETED_PREFIX = "completed_";
 
+	/** 执行完成，等待 Reflection Agent 评估质量 */
 	public static final String EXECUTION_STATUS_WAITING_REFLECTING = "waiting_reflecting_";
 
+	/** 反思评估不通过，等待节点重新执行 */
 	public static final String EXECUTION_STATUS_WAITING_PROCESSING = "waiting_processing_";
 
+	/** 执行出现异常 */
 	public static final String EXECUTION_STATUS_ERROR_PREFIX = "error_";
 
 	/**

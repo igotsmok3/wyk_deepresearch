@@ -29,7 +29,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 专业知识库API客户端工厂 根据配置创建相应的API客户端
+ * 专业知识库 API 客户端工厂，根据知识库配置中的 provider 字段创建对应的 ProfessionalKbApiClient 实例。
+ *
+ * <p>项目职责：知识库客户端的创建与生命周期管理，支持 "dashscope" 和 "custom" 两种 provider，
+ * 可批量初始化多个知识库客户端并过滤不可用的配置项。
+ *
+ * <p>被使用情况：由 ProfessionalKbApiStrategy 在构造时调用 createClients() 批量初始化所有启用的 API 类型知识库客户端。
  *
  * @author hupei
  */

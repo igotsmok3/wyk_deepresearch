@@ -21,7 +21,13 @@ import org.springframework.ai.document.Document;
 import java.util.List;
 
 /**
- * 定义了融合多个检索结果列表的策略接口。
+ * 多路检索结果融合策略接口，将来自不同检索来源的文档列表合并为单一排序结果。
+ *
+ * <p>项目职责：RAG 后处理层的融合抽象，支持不同的融合算法（如 RRF），
+ * 由 RagNode 在多策略检索完成后调用 fuse() 将各路结果合并。
+ *
+ * <p>被使用情况：由 RrfFusionStrategy 实现；RagNode 和 RagNodeService 持有本接口，
+ * 在策略模式（多 RetrievalStrategy）检索完成后执行融合排序。
  */
 public interface FusionStrategy {
 

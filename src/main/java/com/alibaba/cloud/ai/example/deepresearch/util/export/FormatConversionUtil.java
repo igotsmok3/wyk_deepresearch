@@ -31,7 +31,14 @@ import java.io.OutputStream;
 import java.net.URL;
 
 /**
- * 格式转换工具类，提供Markdown到PDF的转换
+ * 格式转换工具类，提供 Markdown → PDF 的完整转换链路。
+ *
+ * <p>项目职责：转换链路为 Markdown → XHTML（{@link HtmlGenerationUtil}）→ PDF（openhtmltopdf + PdfBox）；
+ * 嵌入阿里巴巴普惠体字体确保 PDF 中文显示正常；HTTP 资源加载超时设为 1 秒，防止外链资源阻塞渲染。
+ *
+ * <p>被使用情况：{@code ExportService} 调用 {@code convertMarkdownToPdfFile} 将报告导出为 PDF 文件；
+ * {@code AsyncExportUtil} 调用 {@code convertMarkdownToPdfBytes} 进行异步 PDF 字节流生成；
+ * {@code HtmlGenerationUtil} 作为本类的上游，负责 HTML 片段的生成与包装。
  *
  * @author sixiyida
  * @since 2025/6/20
@@ -40,12 +47,12 @@ public final class FormatConversionUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(FormatConversionUtil.class);
 
-	// HTTP连接超时设置（毫秒）
+	// 限制 PDF 渲染时加载外部 HTTP 资源的超时，防止卡死
 	private static final int RESOURCE_HTTP_CONNECT_TIMEOUT = 1000;
 
 	private static final int RESOURCE_HTTP_READ_TIMEOUT = 1000;
 
-	// 字体路径
+	// 字体路径（classpath）
 	private static final String FONT_PATH = "report/fonts/AlibabaPuHuiTi-3-55-Regular.ttf";
 
 	private static final String FONT_FAMILY = "AlibabaPuHuiTi";

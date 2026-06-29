@@ -19,10 +19,17 @@ package com.alibaba.cloud.ai.example.deepresearch.model.req;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
+ * 人工反馈请求体，携带用户对 Planner 生成计划的审核结果和补充意见。
+ *
+ * <p>项目职责：作为 {@code POST /chat/resume} 接口的请求体，
+ * 在图流程暂停于 {@code human_feedback} 节点时，由前端提交用户是否接受计划及附加的反馈内容，
+ * 驱动图继续执行或重新规划。
+ *
+ * <p>被使用情况：{@code ChatController#resume} 接收该请求并提交给 {@code GraphProcess} 继续流式处理。
+ *
  * @author yingzi
  * @since 2025/6/10
  */
-
 public record FeedbackRequest(
 		/**
 		 * 会话 ID。默认值为 "__default__"，表示使用默认会话。

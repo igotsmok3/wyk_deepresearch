@@ -3,7 +3,16 @@ package com.alibaba.cloud.ai.example.deepresearch.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Short-term memory configuration properties
+ * 短期记忆模块的配置属性类，绑定 {@code spring.ai.alibaba.deepresearch.short-term-memory.*} 前缀的配置项。
+ *
+ * <p>项目职责：属于配置层，控制两套独立的记忆机制：
+ * {@code userRoleMemory}（用户角色画像提取，由 {@code ShortUserRoleMemoryNode} 使用）和
+ * {@code conversationMemory}（对话历史滑动窗口，由 {@code MessageWindowChatMemory} 使用）。
+ * 同时提供记忆存储类型枚举（{@code MemoryType}）和画像注入范围枚举（{@code GuideScope}）。
+ *
+ * <p>被使用情况：被 {@code DeepResearchConfiguration}、{@code MemoryConfig}、
+ * {@code ShortUserRoleMemoryNode}、{@code RewriteAndMultiQueryNode}、{@code ReporterNode} 等多处注入，
+ * 用于控制短期记忆的行为与参数。
  *
  * @author benym
  */
@@ -98,21 +107,18 @@ public class ShortTermMemoryProperties {
 
 	}
 
+	/**
+	 * 控制用户角色画像何时被注入到后续节点（coordinator/planner 等）的提示词中。
+	 * NONE：只提取不注入，画像仅存库，不影响 LLM 行为
+	 * ONCE：只在第一轮注入，后续轮次清空 short_user_role_memory 字段（节省 token）
+	 * EVERY：每轮都注入，持续让 LLM 感知用户背景（默认值）
+	 */
 	public enum GuideScope {
 
-		/**
-		 * No guidance
-		 */
 		NONE,
 
-		/**
-		 * Only in the first round of the guiding model
-		 */
 		ONCE,
 
-		/**
-		 * Each round will guide the model
-		 */
 		EVERY
 
 	}

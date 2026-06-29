@@ -41,7 +41,15 @@ import java.io.File;
 import java.net.URI;
 
 /**
- * Configuration for creating the VectorStore bean based on application properties.
+ * 向量存储 Bean 配置类，根据配置属性选择创建 {@code SimpleVectorStore} 或 {@code ElasticsearchVectorStore}。
+ *
+ * <p>项目职责：属于配置层，仅在 {@code spring.ai.alibaba.deepresearch.rag.enabled=true} 时生效。
+ * 通过内部嵌套的条件配置类（{@code SimpleVectorStoreConfiguration} 和 {@code ElasticsearchVectorStoreConfiguration}）
+ * 按 {@code vector-store-type} 属性值创建对应的 {@code VectorStore} Bean（别名 {@code ragVectorStore}），
+ * 供 RAG 检索管道使用。
+ *
+ * <p>被使用情况：由 Spring 容器直接管理；产出的 {@code ragVectorStore} Bean 被
+ * RAG 服务层（如 {@code VectorStoreDataIngestionService}、{@code RagNodeService}）注入使用。
  *
  * @author hupei
  */

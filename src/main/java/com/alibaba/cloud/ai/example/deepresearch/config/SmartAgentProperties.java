@@ -21,7 +21,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.Map;
 
 /**
- * 智能Agent配置属性
+ * 智能 Agent 功能的配置属性类，绑定 {@code spring.ai.alibaba.deepresearch.smart-agents.*} 前缀的配置项。
+ *
+ * <p>项目职责：属于配置层，提供智能 Agent 功能的启用开关（{@code enabled}）和
+ * 搜索平台映射配置（{@code searchPlatformMapping}），
+ * 控制 BackgroundInvestigationNode 和 ResearcherNode 在执行搜索时选择哪种搜索平台。
+ *
+ * <p>被使用情况：被 {@code DeepResearchConfiguration}、{@code BackgroundInvestigationNode}、
+ * {@code ResearcherNode}、{@code QuestionClassifierService}、{@code AgentIntegrationUtil} 等注入，
+ * 用于判断是否启用智能 Agent 及选择对应搜索平台。
  *
  * @author Makoto
  * @since 2025/07/17

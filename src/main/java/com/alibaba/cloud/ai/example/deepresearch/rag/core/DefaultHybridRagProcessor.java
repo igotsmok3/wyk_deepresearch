@@ -47,7 +47,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * 统一的RAG处理器实现，整合RagAdvisorConfiguration中的前后处理逻辑 和RrfHybridElasticsearchRetriever的混合查询能力
+ * HybridRagProcessor 的默认实现，将查询前处理、混合检索、结果后处理三阶段串联为完整的 RAG 管道。
+ *
+ * <p>项目职责：RAG 核心处理器，根据 RagProperties 配置动态组装各阶段组件：
+ * 查询翻译（TranslationQueryTransformer）、查询扩展（MultiQueryExpander）、
+ * HyDE 转换（HyDeTransformer）、ES 混合检索（RrfHybridElasticsearchRetriever）、
+ * RRF 重排（RrfFusionStrategy）以及首条截断（DocumentSelectFirstProcess）。
+ *
+ * <p>被使用情况：被 ProfessionalKbEsStrategy、ProfessionalKbApiStrategy、UserFileRetrievalStrategy
+ * 注入以执行检索流程；RagNode 和 RagNodeService 也直接依赖本类作为首选检索模式。
  *
  * @author hupei
  */
@@ -113,16 +121,16 @@ public class DefaultHybridRagProcessor implements HybridRagProcessor {
 	public List<Document> process(org.springframework.ai.rag.Query query, Map<String, Object> options) {
 		logger.debug("Starting RAG processing for query: {}", query.text());
 
-		// 1. 查询前处理
+		// 阶段1：查询前处理（翻译 → 扩展 → HyDE），可能得到多条查询
 		List<org.springframework.ai.rag.Query> processedQueries = preProcess(query, options);
 
-		// 2. 构建过滤表达式
+		// 阶段2：构建 ES 过滤条件（按 source_type/session_id/user_id 隔离数据）
 		Query filterExpression = buildFilterExpression(options);
 
-		// 3. 执行混合检索
+		// 阶段3：混合检索（BM25 + KNN，或纯向量）
 		List<Document> documents = hybridRetrieve(processedQueries, filterExpression, options);
 
-		// 4. 文档后处理
+		// 阶段4：后处理（RRF rerank 或 SelectFirst 截断）
 		List<Document> finalDocuments = postProcess(documents, options);
 
 		logger.debug("RAG processing completed. Retrieved {} documents", finalDocuments.size());
@@ -135,7 +143,7 @@ public class DefaultHybridRagProcessor implements HybridRagProcessor {
 		List<org.springframework.ai.rag.Query> queries = new ArrayList<>();
 		queries.add(query);
 
-		// 查询翻译
+		// 步骤1：查询翻译（如中文→英文），解决知识库语言与用户语言不匹配问题
 		if (queryTransformer != null) {
 			queries = queries.stream().flatMap(q -> {
 				org.springframework.ai.rag.Query transformed = queryTransformer.transform(q);
@@ -143,12 +151,12 @@ public class DefaultHybridRagProcessor implements HybridRagProcessor {
 			}).collect(Collectors.toList());
 		}
 
-		// 查询扩展
+		// 步骤2：查询扩展，将1条查询扩展为N条，提升召回率（multiQuery 策略）
 		if (queryExpander != null) {
 			queries = queries.stream().flatMap(q -> queryExpander.expand(q).stream()).collect(Collectors.toList());
 		}
 
-		// 假设性文档生成
+		// 步骤3：HyDE，将每条查询转换为假设性文档，提升向量空间对齐度
 		if (hyDeTransformer != null) {
 			queries = queries.stream().flatMap(q -> {
 				org.springframework.ai.rag.Query transformed = hyDeTransformer.transform(q);
@@ -165,33 +173,33 @@ public class DefaultHybridRagProcessor implements HybridRagProcessor {
 		List<Document> allDocuments = new ArrayList<>();
 
 		for (org.springframework.ai.rag.Query query : queries) {
-			// 如果配置了ES混合查询且可用，使用混合检索器
 			if (hybridRetriever != null) {
+				// ES 混合模式：BM25（关键词）+ KNN（向量），RRF 融合排序
 				List<Document> hybridResults = hybridRetriever.retrieve(query, filterExpression);
 				allDocuments.addAll(hybridResults);
 			}
 			else {
-				// 否则使用标准向量搜索
+				// 降级：SimpleVectorStore 纯向量相似度搜索
 				List<Document> vectorResults = performVectorSearch(query, options);
 				allDocuments.addAll(vectorResults);
 			}
 		}
 
-		// 去重（基于文档ID或内容）
+		// 多查询扩展后可能有重复文档，按 ID 或内容 hash 去重
 		return deduplicateDocuments(allDocuments);
 	}
 
 	@Override
 	public List<Document> postProcess(List<Document> documents, Map<String, Object> options) {
-		// 优先使用RRF rerank，如果启用的话
 		if (ragProperties.getPipeline().isRerankEnabled()) {
+			// RRF rerank：按来源分组后用 RRF 公式重新排序，topK + threshold 截断
 			org.springframework.ai.rag.Query query = new org.springframework.ai.rag.Query(
 					options.getOrDefault("query", "").toString());
 			return rrfFusionStrategy.process(query, documents);
 		}
 
-		// 否则使用传统的后处理器
 		if (documentPostProcessor != null) {
+			// SelectFirst：只保留第一条最相关文档，节省 LLM context
 			return documentPostProcessor.process(null, documents);
 		}
 
@@ -207,7 +215,8 @@ public class DefaultHybridRagProcessor implements HybridRagProcessor {
 		BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
 		boolean hasConditions = false;
 
-		// 按照VectorStoreDataIngestionService中的元数据逻辑构建过滤条件
+		// 与 VectorStoreDataIngestionService 的元数据字段保持一致，实现数据隔离：
+		// source_type 区分数据来源（user_upload / professional_kb_es / professional_kb_api）
 		if (options.containsKey("source_type")) {
 			boolQueryBuilder
 				.must(TermQuery.of(t -> t.field("metadata.source_type").value(options.get("source_type").toString()))
@@ -215,6 +224,7 @@ public class DefaultHybridRagProcessor implements HybridRagProcessor {
 			hasConditions = true;
 		}
 
+		// session_id 确保用户只检索到自己本次会话上传的文件
 		if (options.containsKey("session_id")) {
 			boolQueryBuilder
 				.must(TermQuery.of(t -> t.field("metadata.session_id").value(options.get("session_id").toString()))
@@ -222,6 +232,7 @@ public class DefaultHybridRagProcessor implements HybridRagProcessor {
 			hasConditions = true;
 		}
 
+		// user_id 进一步限定用户维度（可选）
 		if (options.containsKey("user_id")) {
 			boolQueryBuilder.must(
 					TermQuery.of(t -> t.field("metadata.user_id").value(options.get("user_id").toString()))._toQuery());

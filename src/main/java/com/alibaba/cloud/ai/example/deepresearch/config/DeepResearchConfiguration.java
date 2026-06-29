@@ -62,6 +62,16 @@ import static com.alibaba.cloud.ai.graph.action.AsyncNodeAction.node_async;
 import com.alibaba.cloud.ai.example.deepresearch.service.McpProviderFactory;
 
 /**
+ * DeepResearch 核心图配置类，负责组装并注册整个 AI 研究工作流的 {@link StateGraph} Bean。
+ *
+ * <p>项目职责：属于配置层的核心类，将所有图节点（node/）和边调度器（dispatcher/）串联成完整的有向图。
+ * 定义图的状态键策略、节点列表（coordinator、planner、researcher_N、coder_N、reporter 等）及条件边路由，
+ * 同时负责根据配置动态添加并行 researcher 和 coder 节点块。启动时打印 PlantUML 格式的工作流图。
+ *
+ * <p>被使用情况：由 Spring 容器直接管理；产出的 {@code deepResearch} StateGraph Bean 被
+ * {@code ChatController} 编译为 {@code CompiledGraph} 后驱动整个研究流程执行。
+ * {@code ReflectionProcessor} 的创建也在本类中完成。
+ *
  * @author yingzi
  * @since 2025/5/17 17:10
  */

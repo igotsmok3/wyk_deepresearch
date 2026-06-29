@@ -18,6 +18,13 @@ package com.alibaba.cloud.ai.example.deepresearch.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * 报告导出操作的结果数据传输对象，封装导出文件的路径、格式及错误信息。
+ *
+ * <p>项目职责：作为报告导出接口的响应数据，包含导出是否成功、文件路径、下载链接等信息。
+ *
+ * <p>被使用情况：{@code ReportController} 在导出报告时将其包装进 {@code ReportResponse} 返回给前端。
+ */
 public record ExportData(
 		/**
 		 * 操作是否成功

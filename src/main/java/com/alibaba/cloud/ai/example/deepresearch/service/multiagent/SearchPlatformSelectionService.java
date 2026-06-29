@@ -36,7 +36,17 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 搜索平台选择服务，根据Agent类型和问题内容智能选择最合适的搜索平台
+ * 搜索平台选择服务，根据 Agent 类型和问题内容智能决策最适合的搜索平台。
+ *
+ * <p>项目职责：封装搜索平台的选择逻辑——优先读取 {@code SmartAgentProperties} 中的静态配置
+ * {@code search-platform-mapping}，无配置时再调用 AI 动态决策；将结果转换为
+ * {@code SearchEnum} 列表或 {@code SearchPlatform}（用于工具调用分支）返回给调用方。
+ * 主平台不可用时按 Tavily → Aliyun → Baidu → SerpAPI 顺序降级。
+ * 仅在 smart-agents 功能开启时注册为 Bean。
+ *
+ * <p>被使用情况：被 {@code SmartAgentDispatcherService}、{@code SmartAgentSelectionHelperService}
+ * 和 {@code BackgroundInvestigationNode} 注入，协同完成搜索引擎路由；
+ * 也通过 {@code AgentIntegrationUtil} 间接引用。
  *
  * @author Makoto
  * @since 2025/07/17
@@ -63,12 +73,12 @@ public class SearchPlatformSelectionService {
 	}
 
 	/**
-	 * 根据Agent类型选择主要搜索平台（统一的平台选择逻辑）
+	 * 平台选择核心逻辑：优先读静态配置，无配置时才调用 AI 动态决策。
+	 * 静态配置通过 search-platform-mapping 指定，AI 决策有网络延迟，故配置优先。
 	 */
 	private SearchPlatform selectPlatformInternal(AgentType agentType, String question) {
 		SearchPlatform primaryPlatform = getPrimaryPlatformFromConfig(agentType);
 
-		// 如果配置中没有，则使用AI智能选择
 		if (primaryPlatform == null) {
 			primaryPlatform = selectPrimaryPlatformByAI(agentType, question);
 		}
@@ -77,7 +87,9 @@ public class SearchPlatformSelectionService {
 	}
 
 	/**
-	 * 根据Agent类型选择主要搜索平台
+	 * 根据 Agent 类型选择对应的 SearchEnum 列表，供传统搜索引擎使用。
+	 * 若选中的是工具调用平台（如 OpenAlex），返回 TAVILY 作为占位符；
+	 * 调用方应根据 isToolCallingPlatform() 判断是否真正走工具调用分支。
 	 */
 	public List<SearchEnum> selectSearchPlatforms(AgentType agentType, String question) {
 		List<SearchEnum> searchPlatforms = new ArrayList<>();
@@ -86,7 +98,7 @@ public class SearchPlatformSelectionService {
 			SearchPlatform primaryPlatform = selectPlatformInternal(agentType, question);
 
 			if (SmartAgentUtil.isToolCallingPlatform(primaryPlatform)) {
-				// 对于工具调用平台，返回一个特殊标识，让调用方知道需要使用工具调用。使用 TAVILY 作为占位符，实际会被工具调用覆盖
+				// 工具调用平台不对应 SearchEnum，用 TAVILY 占位，实际由 ToolCallingSearchService 处理
 				searchPlatforms.add(SearchEnum.TAVILY);
 				logger.info("Selected tool calling platform for agent type {}: {}", agentType,
 						primaryPlatform.getName());
@@ -98,7 +110,7 @@ public class SearchPlatformSelectionService {
 				}
 			}
 
-			// 如果主要搜索平台不可用，使用默认的通用搜索
+			// 主平台不可用时降级到默认搜索引擎（按 Tavily→Aliyun→Baidu→SerpAPI 顺序取第一个可用）
 			if (searchPlatforms.isEmpty()) {
 				addDefaultSearchEngines(searchPlatforms);
 			}

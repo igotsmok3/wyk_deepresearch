@@ -20,7 +20,13 @@ import com.alibaba.cloud.ai.example.deepresearch.config.DeepResearchProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * 导出功能相关的配置属性
+ * 报告导出功能的配置属性类，绑定 {@code spring.ai.alibaba.deepresearch.export.*} 前缀的配置项。
+ *
+ * <p>项目职责：属于配置层，提供报告文件的导出根路径配置，默认为 {@code ~/reports}，
+ * 可通过环境变量 {@code AI_DEEPRESEARCH_EXPORT_PATH} 或配置文件覆盖。
+ *
+ * <p>被使用情况：被 {@code ExportConfiguration} 读取以构造 {@code ExportService}；
+ * {@code ExportService} 中也有文档说明直接依赖本属性提供的路径。
  *
  * @author sixiyida
  * @since 2025/6/20

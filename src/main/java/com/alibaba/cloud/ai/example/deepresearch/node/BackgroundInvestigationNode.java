@@ -47,10 +47,23 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
+ * 背景调查节点：对用户查询的每条优化变体执行网络搜索，并调用 backgroundAgent 生成结构化背景摘要。
+ *
+ * <p>项目职责：位于 rewrite_multi_query 之后，planner / reporter 之前。从 OverAllState 读取
+ * {@code optimize_queries}（由 RewriteAndMultiQueryNode 写入的多条扩展查询），对每条查询独立
+ * 搜索并汇总，最终写入：
+ * <ul>
+ *   <li>{@code site_information}：所有查询的原始搜索结果列表，供 reporter 引用来源</li>
+ *   <li>{@code background_investigation_results}：backgroundAgent 为每条查询生成的摘要</li>
+ *   <li>{@code background_investigation_next_node}：路由键，深度研究时为 planner，简单问题时为 reporter</li>
+ * </ul>
+ *
+ * <p>被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code background_investigator} 注册到图中；
+ * {@code BackgroundInvestigationDispatcher} 读取 {@code background_investigation_next_node} 进行边路由。
+ *
  * @author yingzi
  * @since 2025/5/17 18:37
  */
-
 public class BackgroundInvestigationNode implements NodeAction {
 
 	private static final Logger logger = LoggerFactory.getLogger(BackgroundInvestigationNode.class);
@@ -85,25 +98,27 @@ public class BackgroundInvestigationNode implements NodeAction {
 
 		Map<String, Object> resultMap = new HashMap<>();
 		List<List<Map<String, String>>> resultsList = new ArrayList<>();
+		// optimize_queries 由 RewriteAndMultiQueryNode 写入，包含原始查询及其扩展变体
 		List<String> queries = StateUtil.getOptimizeQueries(state);
 		assert queries != null && !queries.isEmpty();
 
+		// 对每条优化查询独立搜索：SmartAgent 开启时按问题类型选平台，否则用请求指定引擎
 		for (String query : queries) {
-			// 使用统一的智能搜索选择方法
 			SmartAgentUtil.SearchSelectionResult searchSelection = smartAgentSelectionHelper
 				.intelligentSearchSelection(state, query);
 			List<Map<String, String>> results;
 
-			// 使用支持工具调用的搜索方法
 			results = searchInfoService.searchInfo(StateUtil.isSearchFilter(state), searchSelection.getSearchEnum(),
 					query, searchSelection.getSearchPlatform());
 			resultsList.add(results);
 		}
+		// site_information 供后续 reporter 直接引用来源
 		resultMap.put("site_information", resultsList);
 
 		List<String> backgroundResults = new ArrayList<>();
 		assert resultsList.size() == queries.size();
 
+		// 对每个查询及其搜索结果，调用 backgroundAgent 生成结构化的背景调查小结
 		for (int i = 0; i < resultsList.size(); i++) {
 			List<Map<String, String>> searchResults = resultsList.get(i);
 
@@ -116,6 +131,7 @@ public class BackgroundInvestigationNode implements NodeAction {
 								r.get("content"), r.get("url"));
 					}).collect(Collectors.joining("\n\n")));
 
+			// 注入历史报告作为 AssistantMessage，让 Agent 了解用户的研究背景，避免重复
 			String sessionId = state.value("session_id", String.class).orElse("__default__");
 			List<SessionHistory> reports = sessionContextService.getRecentReports(sessionId);
 			Message lastReportMessage;
@@ -136,6 +152,7 @@ public class BackgroundInvestigationNode implements NodeAction {
 		}
 		resultMap.put("background_investigation_results", backgroundResults);
 
+		// 简单问题（非深度研究）直接跳到 reporter；深度研究需要先规划
 		String nextStep = "planner";
 		if (!StateUtil.isDeepresearch(state)) {
 			nextStep = "reporter";

@@ -19,7 +19,14 @@ package com.alibaba.cloud.ai.example.deepresearch.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * properties for reflection
+ * Reflection 质量评估机制的配置属性类，绑定 {@code spring.ai.alibaba.deepresearch.reflection.*} 前缀的配置项。
+ *
+ * <p>项目职责：属于配置层，控制 ResearcherNode 和 CoderNode 执行结果的自我反思评估功能，
+ * 提供功能开关（{@code enabled}）和最大重试次数（{@code maxAttempts}）两个核心参数，
+ * 防止评估过程因质量不达标而陷入无限循环。
+ *
+ * <p>被使用情况：被 {@code DeepResearchConfiguration#reflectionProcessor()} 读取以决定是否创建
+ * {@code ReflectionProcessor} Bean；{@code DeepResearchConfiguration} 通过 {@code @EnableConfigurationProperties} 激活本类。
  *
  * @author sixiyida
  * @since 2025/7/10
@@ -30,12 +37,14 @@ public class ReflectionProperties {
 	public static final String PREFIX = DeepResearchProperties.PREFIX + ".reflection";
 
 	/**
-	 * enable reflection or not
+	 * 是否启用 Reflection 质量评估机制。
+	 * false 时 ResearcherNode / CoderNode 完成后直接标记 completed，跳过评估循环。
 	 */
 	private boolean enabled = true;
 
 	/**
-	 * max reflection attempt count
+	 * 单个 Step 最多允许反思重试的次数。
+	 * 超出后强制标记通过，防止无限循环。
 	 */
 	private int maxAttempts = 2;
 

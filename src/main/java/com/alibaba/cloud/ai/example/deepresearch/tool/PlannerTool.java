@@ -22,6 +22,15 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Service;
 
 /**
+ * Planner 工具类，提供供 LLM 调用的 {@code handoff_to_planner} 工具，用于将任务移交给 Planner Agent 制定计划。
+ *
+ * <p>项目职责：作为 Spring AI Tool，当 Coordinator Agent 判断需要进行深度研究时，
+ * 通过 LLM 调用本工具发出移交信号，触发图流程从 coordinator 节点流转到 planner 节点。
+ * 方法本身不返回任何值，仅作为 LLM 的控制信号。
+ *
+ * <p>被使用情况：{@code AgentsConfiguration} 将本类实例注入 Coordinator Agent 的 toolCallbacks，
+ * 由 Spring AI 工具调用框架管理其生命周期。
+ *
  * @author yingzi
  * @since 2025/5/17 18:10
  */

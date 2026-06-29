@@ -42,8 +42,18 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * A NodeAction that uses the RAG pipeline to generate a response based on user input.
- * 使用统一的HybridRagProcessor进行RAG前后处理和混合查询
+ * RAG 图节点：通过 RAG 管道检索相关文档，再将文档内容作为上下文喂给 LLM 流式生成答案。
+ *
+ * <p>项目职责：支持两种工作模式（向后兼容）。推荐模式使用 {@code HybridRagProcessor}
+ * 走完整的查询处理→混合检索→后处理管道；兼容模式使用多个 {@code RetrievalStrategy} 各自检索、
+ * {@code FusionStrategy} 融合结果。从 OverAllState 读取 {@code query}、{@code session_id}、
+ * {@code user_id}，检索完成后将文档内容拼接为上下文，流式调用 ragAgent 生成答案。
+ * 写入 OverAllState：{@code rag_content}（携带流式 Flux 的 GraphResponse）。
+ *
+ * <p>被使用情况：由 {@code RagNodeService} 创建两个实例并通过 {@code DeepResearchConfiguration} 注册：
+ * {@code user_file_rag}（检索用户上传文件）和 {@code professional_kb_rag}（检索专业知识库）。
+ * {@code RewriteAndMultiQueryNode} 在用户上传文件时路由到 user_file_rag；
+ * {@code ProfessionalKbDispatcher} 在决策结果为 true 时路由到 professional_kb_rag。
  *
  * @author hupei
  */
@@ -84,21 +94,21 @@ public class RagNode implements NodeAction {
 		logger.info("rag_node is running.");
 		String queryText = StateUtil.getQuery(state);
 
+		// session_id 和 user_id 传入 options，用于 buildFilterExpression 进行数据隔离
 		Map<String, Object> options = new HashMap<>();
 		state.value("session_id", String.class).ifPresent(v -> options.put("session_id", v));
 		state.value("user_id", String.class).ifPresent(v -> options.put("user_id", v));
-		options.put("query", queryText); // 添加查询文本供后处理使用
+		options.put("query", queryText); // RRF 后处理需要原始查询文本
 
 		List<Document> documents = new ArrayList<>();
 
-		// 使用统一的RAG处理器或传统的策略模式
 		if (hybridRagProcessor != null) {
-			// 使用统一的RAG处理器，包含完整的前后处理逻辑
+			// 走完整 RAG 管道：查询处理 → 混合检索 → 后处理
 			Query query = new Query(queryText);
 			documents = hybridRagProcessor.process(query, options);
 		}
 		else if (retrievalStrategies != null && fusionStrategy != null) {
-			// 传统策略模式（向后兼容）
+			// 兼容旧版策略模式：各策略独立检索，最后 FusionStrategy 融合
 			List<List<Document>> allResults = new ArrayList<>();
 			for (RetrievalStrategy strategy : retrievalStrategies) {
 				allResults.add(strategy.retrieve(queryText, options));
@@ -106,13 +116,13 @@ public class RagNode implements NodeAction {
 			documents = fusionStrategy.fuse(allResults);
 		}
 
-		// 构建上下文
+		// 将检索到的文档内容拼接为 LLM 的上下文（RAG 的 "Augmentation" 阶段）
 		StringBuilder contextBuilder = new StringBuilder();
 		for (Document doc : documents) {
 			contextBuilder.append(doc.getText()).append("\n");
 		}
 
-		// 生成响应
+		// 将上下文 + 用户原始问题发给 LLM 生成最终答案（流式输出）
 		Flux<ChatResponse> streamResult = ragAgent.prompt()
 			.messages(new UserMessage(contextBuilder.toString()))
 			.user(queryText)

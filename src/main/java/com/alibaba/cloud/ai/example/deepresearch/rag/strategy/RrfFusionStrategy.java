@@ -30,8 +30,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * RAG中RRF（Reciprocal Rank Fusion）融合策略实现。 该策略根据文档在多个结果列表中的排名，计算其 RRF 分数，并返回融合后的文档列表。
- * 同时实现DocumentPostProcessor接口，支持后处理的rerank功能。
+ * 基于 RRF（Reciprocal Rank Fusion）算法的融合与重排策略，公式为 score(doc) = Σ 1/(k + rank_i)。
+ *
+ * <p>项目职责：同时实现 FusionStrategy 和 DocumentPostProcessor 两个接口：
+ * 作为 FusionStrategy 时将多路检索结果列表融合为单一排序列表；
+ * 作为 DocumentPostProcessor 时按 source_type 分组后对单次检索结果执行 rerank，
+ * 两者均支持 topK 截断和相似度阈值过滤。
+ *
+ * <p>被使用情况：DefaultHybridRagProcessor 在 rerankEnabled=true 时注入并在 postProcess 阶段调用；
+ * RagNodeService 将本类作为 FusionStrategy 注入到 RagNode 中用于多策略结果融合。
  *
  * @author hupei
  */
@@ -84,20 +91,21 @@ public class RrfFusionStrategy implements FusionStrategy, DocumentPostProcessor 
 	}
 
 	/**
-	 * 内部融合方法，支持topK和threshold限制
+	 * 内部融合核心逻辑：
+	 * 1. 遍历每个结果列表，按排名计算每个文档的 RRF 累加分
+	 * 2. 按分数降序排列，过滤低于 threshold 的文档，截取 topK 条返回
 	 */
 	private List<Document> fuseInternal(List<List<Document>> results, int topK, double threshold) {
 		if (results == null || results.isEmpty()) {
 			return List.of();
 		}
 		if (results.size() == 1) {
+			// 只有一个来源不需要融合，直接 topK 截断
 			List<Document> singleResult = results.get(0);
 			return singleResult.stream().limit(topK).collect(Collectors.toList());
 		}
 
-		// 使用 Map 来存储每个文档的 RRF 分数，以文档ID为键
 		Map<String, Double> rrfScores = new HashMap<>();
-		// 使用 Map 来存储文档ID到 Document 对象的映射，避免重复存储
 		Map<String, Document> documentMap = new HashMap<>();
 
 		for (List<Document> resultList : results) {
@@ -106,18 +114,16 @@ public class RrfFusionStrategy implements FusionStrategy, DocumentPostProcessor 
 				int rank = i + 1; // 排名从1开始
 				String docId = getDocumentId(doc);
 
-				// 更新文档的 RRF 分数
+				// RRF 公式：score += 1/(k + rank)，同一文档在多个列表中出现时累加
 				rrfScores.merge(docId, 1.0 / (k + rank), Double::sum);
-				// 如果是第一次遇到该文档，则存入 map
 				documentMap.putIfAbsent(docId, doc);
 			}
 		}
 
-		// 根据 RRF 分数对文档ID进行降序排序，并应用过滤条件
 		return rrfScores.entrySet()
 			.stream()
 			.sorted(Map.Entry.<String, Double>comparingByValue().reversed())
-			.filter(entry -> entry.getValue() >= threshold)
+			.filter(entry -> entry.getValue() >= threshold) // 过滤相关性过低的文档
 			.limit(topK)
 			.map(entry -> documentMap.get(entry.getKey()))
 			.collect(Collectors.toList());

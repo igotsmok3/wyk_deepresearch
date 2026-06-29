@@ -34,6 +34,17 @@ import java.io.ObjectOutput;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+/**
+ * DeepResearch 图状态序列化器，基于 Jackson JSON 实现 {@code OverAllState} 的持久化与恢复。
+ *
+ * <p>项目职责：继承 {@code PlainTextStateSerializer}，注册自定义的 {@code MessageDeserializer}
+ * 和 {@code DeepResearchDeserializer}，解决图状态中 {@code Message} 多态和 {@code Plan}、
+ * {@code SearchEnum} 反序列化的类型擦除问题；使用字节数组（而非 UTF 字符串）写入避免大数据量时的长度限制。
+ *
+ * <p>被使用情况：{@code DeepResearchConfiguration} 在构建 {@code StateGraph} 时，
+ * 以 {@code new DeepResearchStateSerializer(OverAllState::new)} 的形式传入，
+ * 作为检查点存储（MemorySaver）的序列化实现。
+ */
 public class DeepResearchStateSerializer extends PlainTextStateSerializer {
 
 	protected final ObjectMapper objectMapper;

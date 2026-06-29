@@ -22,14 +22,20 @@ import com.alibaba.cloud.ai.graph.action.EdgeAction;
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
 
 /**
- * @author yingzi
- * @since 2025/5/17 18:31
+ * {@code coordinator} 节点的条件边路由器，根据协调者判断结果决定是否启动深度研究流程。
+ *
+ * <p>项目职责：dispatcher 层的边路由实现，读取 {@code CoordinatorNode} 执行后写入状态的
+ * {@code coordinator_next_node} 键：若 LLM 判断需要深度研究则路由至 {@code "rewrite_multi_query"}，
+ * 否则直接终止（{@code END}）。
+ *
+ * <p>被使用情况：由 {@link com.alibaba.cloud.ai.example.deepresearch.config.DeepResearchConfiguration}
+ * 通过 {@code addConditionalEdges("coordinator", ...)} 注册到图配置中。
  */
-
 public class CoordinatorDispatcher implements EdgeAction {
 
 	@Override
 	public String apply(OverAllState state) {
+		// 读取 CoordinatorNode 写入的路由决策，缺省终止图执行
 		return (String) state.value("coordinator_next_node", END);
 	}
 

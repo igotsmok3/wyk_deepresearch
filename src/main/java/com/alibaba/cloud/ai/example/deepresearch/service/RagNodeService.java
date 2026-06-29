@@ -31,6 +31,16 @@ import java.util.List;
 import static com.alibaba.cloud.ai.graph.action.AsyncNodeAction.node_async;
 
 /**
+ * RAG 节点工厂服务，负责按需创建用户文件检索和专业知识库检索两类 RAG 节点。
+ *
+ * <p>项目职责：封装 {@code RagNode} 的实例化逻辑，优先使用统一的 {@code HybridRagProcessor}
+ * 创建节点（包含完整的前后处理和混合查询能力），若不可用则回退到独立的
+ * {@code UserFileRetrievalStrategy} 或 {@code ProfessionalKbEsStrategy} 策略模式。
+ * 所有依赖均通过 {@code @Autowired(required = false)} 注入，保证在 RAG 未启用时也不会报错。
+ *
+ * <p>被使用情况：被 {@code DeepResearchConfiguration} 注入，用于在图组装阶段向
+ * {@code StateGraph} 注册 {@code user_file_rag} 和 {@code professional_kb_rag} 两个节点。
+ *
  * @author yingzi
  * @since 2025/8/10
  */

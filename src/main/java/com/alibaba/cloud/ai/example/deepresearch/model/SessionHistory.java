@@ -24,7 +24,14 @@ import org.springframework.ai.chat.messages.UserMessage;
 import java.util.List;
 
 /**
- * 会话记录，用于存储用户与LLM的交互结果
+ * 会话历史记录，存储一次完整研究会话的图 ID、用户问题和生成报告。
+ *
+ * <p>项目职责：作为跨请求的会话上下文载体，由 {@code ReporterNode} 在报告生成后写入，
+ * 供 {@code BackgroundInvestigationNode} 在后续请求中读取历史报告作为背景信息。
+ *
+ * <p>被使用情况：{@code ReporterNode} 构建并通过 {@code SessionContextService} 存储该对象；
+ * {@code BackgroundInvestigationNode} 读取历史记录拼接背景调查 Prompt；
+ * {@code InMemorySessionContextService} 以线程 ID 为键管理该对象的内存存储。
  */
 public class SessionHistory {
 

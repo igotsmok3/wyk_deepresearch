@@ -16,6 +16,16 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * 将 {@link reactor.core.publisher.Flux}&lt;ChatResponse&gt; 转换为图流式输出的工厂接口。
+ *
+ * <p>项目职责：封装 ChatResponse 流到 {@code Flux<GraphResponse<StreamingOutput>>} 的转换逻辑，
+ * 包括消息累积合并、完成信号注入以及状态结果回调，供各图节点在生成流式内容时统一使用。
+ *
+ * <p>被使用情况：{@code PlannerNode}、{@code ReporterNode}、{@code ResearcherNode} 通过
+ * {@code FluxConverter.builder()} 构建流式生成器，将 LLM 输出转换为图可消费的
+ * {@code StreamingOutput} 事件序列。
+ */
 public interface FluxConverter {
 
 	static FluxConverter.Builder builder() {

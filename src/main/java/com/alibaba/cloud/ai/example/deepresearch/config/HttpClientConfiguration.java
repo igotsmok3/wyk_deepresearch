@@ -27,7 +27,14 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 /**
- * HTTP客户端配置 提供RestClient等HTTP客户端的Bean配置，支持配置化参数
+ * HTTP 客户端配置类，提供 {@code RestClient} 及 {@code ClientHttpRequestFactory} Bean，支持通过配置文件定制超时与连接池参数。
+ *
+ * <p>项目职责：属于配置层，使用 Apache HttpComponents 创建带连接池和可配置超时的 HTTP 客户端，
+ * 供需要发起外部 HTTP 请求的服务（如 RAG 检索、搜索引擎调用等）注入使用。
+ * 内部静态类 {@link HttpClientProperties} 绑定 {@code spring.ai.alibaba.deepresearch.http-client.*} 前缀配置。
+ *
+ * <p>被使用情况：由 Spring 容器直接管理；{@code RestClient} 和 {@code RestClient.Builder} Bean
+ * 被项目中需要发起 HTTP 请求的服务类注入使用。
  *
  * @author hupei
  */

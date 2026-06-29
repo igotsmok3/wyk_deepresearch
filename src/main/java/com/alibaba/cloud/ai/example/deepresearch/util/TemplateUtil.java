@@ -32,10 +32,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * Prompt 模板工具类，提供从 classpath 加载 Prompt 模板并替换占位符生成 Spring AI {@code Message} 的能力。
+ *
+ * <p>项目职责：封装节点 Prompt 构建的通用逻辑，包括加载并替换 {@code {{ CURRENT_TIME }}}、
+ * {@code {{ max_step_num }}} 等占位符生成系统提示词，构建短期记忆提取/更新 Prompt，
+ * 以及将用户角色画像注入消息列表，供各节点调用以减少重复的模板处理代码。
+ *
+ * <p>被使用情况：{@code CoordinatorNode}、{@code PlannerNode}、{@code ResearcherNode}、
+ * {@code ReporterNode}、{@code BackgroundInvestigationNode} 使用本类加载系统提示词和注入角色画像；
+ * {@code ShortUserRoleMemoryNode} 使用本类构建短期记忆的提取与更新 Prompt。
+ *
  * @author yingzi
  * @since 2025/5/17 17:20
  */
-
 public class TemplateUtil {
 
 	public static Message getMessage(String promptName) throws IOException {
@@ -105,6 +114,14 @@ public class TemplateUtil {
 		return userMessage;
 	}
 
+	/**
+	 * 将用户角色画像注入消息列表，作为最先出现的系统提示词。
+	 * <p>
+	 * ShortUserRoleMemoryNode 把画像 JSON 写入 OverAllState["short_user_role_memory"]，
+	 * 各节点（coordinator/planner/backgroundInvestigator）在构建提示词时调用此方法，
+	 * 让 LLM 知道用户是谁（职业/技术背景/偏好），从而调整回复风格和深度。
+	 * GuideScope=NONE 或 ONCE 第二轮以后，state 中该字段为空字符串，此方法不会添加任何消息。
+	 */
 	public static void addShortUserRoleMemory(List<Message> messages, OverAllState state) {
 		String shortUserRoleMemory = state.value("short_user_role_memory", "");
 		if (StringUtils.hasText(shortUserRoleMemory)) {

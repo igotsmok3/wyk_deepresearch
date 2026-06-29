@@ -32,7 +32,16 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * MCP配置合并工具类
+ * MCP 配置合并与 Transport 创建工具类，提供静态配置与请求级动态配置的合并以及 SSE Transport 的构建能力。
+ *
+ * <p>项目职责：封装三个核心操作：(1) {@code mergeAgent2McpConfigs} 将 mcp-config.json 静态配置
+ * 与运行时 mcp_settings 合并；(2) {@code mergeAgent2McpServers} 以 URL 为 key 对 Server 列表去重合并；
+ * (3) {@code createAgent2McpTransports} 将 Server 配置转换为 WebFlux SSE Transport，
+ * 供后续 MCP 客户端握手使用。
+ *
+ * <p>被使用情况：{@code McpAssignNodeConfiguration} 调用 {@code mergeAgent2McpConfigs}
+ * 在请求粒度合并 MCP 配置；{@code McpClientUtil} 调用 {@code createAgent2McpTransports}
+ * 为每个启用的 Server 创建 SSE 传输层。
  *
  * @author Makoto
  */
@@ -41,7 +50,8 @@ public class McpConfigMergeUtil {
 	private static final Logger logger = LoggerFactory.getLogger(McpConfigMergeUtil.class);
 
 	/**
-	 * 合并静态配置和动态配置
+	 * 将文件静态配置与运行时动态配置合并，返回最终生效的配置 Map。
+	 * runtimeSettings 的结构与 mcp-config.json 相同（agentName -> { "mcp-servers": [...] }）。
 	 */
 	public static Map<String, McpAssignNodeProperties.McpServerConfig> mergeAgent2McpConfigs(
 			Map<String, McpAssignNodeProperties.McpServerConfig> staticConfig, Map<String, Object> runtimeSettings,
@@ -84,7 +94,8 @@ public class McpConfigMergeUtil {
 	}
 
 	/**
-	 * 合并服务器配置列表（相同URL覆盖，新URL追加）
+	 * 合并两个 Server 列表：以 URL 为 key，动态配置覆盖静态配置，新 URL 则追加。
+	 * 使用 LinkedHashMap 保持 Server 顺序稳定。
 	 */
 	public static List<McpAssignNodeProperties.McpServerInfo> mergeAgent2McpServers(
 			List<McpAssignNodeProperties.McpServerInfo> staticServers,
@@ -105,7 +116,9 @@ public class McpConfigMergeUtil {
 	}
 
 	/**
-	 * 创建Transport的辅助方法
+	 * 将 McpServerConfig 中启用的 Server 转换为 WebFluxSseClientTransport 列表。
+	 * transportName 格式：agentName-{url.hashCode()}，用于在 configurer 中区分不同连接。
+	 * sseEndpoint 未配置时默认使用 /sse。
 	 */
 	public static List<NamedClientMcpTransport> createAgent2McpTransports(String agentName,
 			McpAssignNodeProperties.McpServerConfig config, WebClient.Builder webClientBuilderTemplate,

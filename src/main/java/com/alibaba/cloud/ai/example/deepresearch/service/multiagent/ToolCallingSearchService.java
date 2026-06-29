@@ -33,7 +33,17 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * 工具调用搜索服务，根据不同的Agent类型调用相应的专用工具调用服务
+ * 专用领域工具调用搜索服务，针对不同 {@code SearchPlatform} 调用对应的领域搜索 Bean。
+ *
+ * <p>项目职责：持有各领域 {@code SearchService} 的引用（OpenAlex、OpenTripMap、
+ * TripAdvisor、Wikipedia、WorldBankData、GoogleScholar），根据传入的 {@code SearchPlatform}
+ * 路由到对应实现，将结果统一转换为 {@code List<Map<String, String>>} 格式并标注来源。
+ * 所有依赖 Bean 均通过 {@code @Nullable} 注入，缺失时优雅跳过。
+ * 仅在 smart-agents 功能开启时注册为 Bean。
+ *
+ * <p>被使用情况：被 {@code SearchInfoService} 在工具调用搜索分支中调用；
+ * 被 {@code BackgroundInvestigationNode} 和 {@code DeepResearchConfiguration} 注入，
+ * 用于执行专用领域数据源的搜索请求。
  *
  * @author Makoto
  * @since 2025/07/17

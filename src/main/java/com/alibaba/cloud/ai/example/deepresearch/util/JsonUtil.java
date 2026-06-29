@@ -16,6 +16,15 @@ import org.springframework.util.StringUtils;
 import java.text.SimpleDateFormat;
 
 /**
+ * JSON 序列化/反序列化工具类，基于 Jackson ObjectMapper 提供对象与 JSON 字符串的相互转换。
+ *
+ * <p>项目职责：封装全局统一配置的 ObjectMapper（忽略未知属性、不序列化空 Bean、
+ * 非 null 字段才序列化、注册 Jdk8Module / JavaTimeModule），简化各模块的 JSON 处理代码。
+ *
+ * <p>被使用情况：{@code TemplateUtil} 使用本类将短期记忆对象序列化为 JSON 注入 Prompt 模板；
+ * {@code ShortUserRoleMemoryNode} 使用本类序列化/反序列化用户角色画像；
+ * 其他工具类和节点按需调用。
+ *
  * @author benym
  */
 public class JsonUtil {

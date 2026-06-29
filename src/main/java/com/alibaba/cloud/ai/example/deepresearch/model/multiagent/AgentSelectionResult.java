@@ -21,7 +21,15 @@ import org.springframework.ai.chat.client.ChatClient;
 import java.util.Map;
 
 /**
- * 智能Agent选择结果
+ * 智能 Agent 最终选择结果，封装执行研究任务所用的 Agent 实例、类型及选择原因。
+ *
+ * <p>项目职责：由 {@code SmartAgentSelectionHelperService} 组装并返回，
+ * 作为节点执行前的 Agent 决策载体，{@code isSmartAgent} 标识是否启用了多 Agent 路由，
+ * {@code stateUpdate} 携带需要写回图状态的配置信息。
+ *
+ * <p>被使用情况：{@code ResearcherNode} 调用 {@code selectSmartAgent} 获取该结果，
+ * 并据此选择实际执行研究任务的 Agent；
+ * {@code SmartAgentSelectionHelperService} 负责构建并返回该对象。
  *
  * @author Makoto
  * @since 2025/07/17

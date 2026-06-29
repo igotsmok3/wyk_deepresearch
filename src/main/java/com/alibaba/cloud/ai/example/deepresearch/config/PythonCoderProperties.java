@@ -19,7 +19,15 @@ package com.alibaba.cloud.ai.example.deepresearch.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Python Coder Config
+ * Python 代码执行器的配置属性类，绑定 {@code spring.ai.alibaba.deepresearch.python-coder.*} 前缀的配置项。
+ *
+ * <p>项目职责：属于配置层，提供 Docker 容器运行 Python 代码所需的参数，包括 Docker Host 地址、
+ * 容器命名前缀、内存与 CPU 限制、网络访问开关、代码执行超时时长及镜像名称等，
+ * 供 {@code PythonReplTool} 在运行时创建并管理临时 Python 容器。
+ *
+ * <p>被使用情况：被 {@code AgentsConfiguration#coderAgent} 方法注入以构造 {@code PythonReplTool}；
+ * {@code PythonReplTool} 在执行 Python 代码时直接读取本配置项中的 Docker 相关参数；
+ * {@code DeepResearchConfiguration} 通过 {@code @EnableConfigurationProperties} 激活本类。
  *
  * @author vlsmb
  */

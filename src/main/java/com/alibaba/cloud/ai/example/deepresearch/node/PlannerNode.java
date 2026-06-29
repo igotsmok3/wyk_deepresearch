@@ -44,6 +44,18 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
+ * 规划节点：基于背景调查结果、用户反馈和 RAG 内容，调用 LLM 生成结构化研究计划（{@code Plan} JSON）。
+ *
+ * <p>项目职责：位于 background_investigator 之后，information 之前。按顺序从 OverAllState 读取：
+ * 用户角色画像、优化后的查询（{@code optimize_queries}）、背景调查摘要
+ * （{@code background_investigation_results}）、用户反馈（{@code feedback_content}）、
+ * RAG 内容（{@code rag_content}）等，拼装为 plannerAgent 的输入消息，流式输出研究计划 JSON。
+ * 写入 OverAllState：{@code planner_content}（携带流式 Flux 的 GraphResponse）。
+ *
+ * <p>被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code planner} 注册到图中；
+ * {@code InformationNode} 在反序列化失败且未超过最大迭代时会回路路由到本节点重新规划；
+ * {@code HumanFeedbackNode} 在用户拒绝计划时同样路由回本节点。
+ *
  * @author yingzi
  * @since 2025/5/18 16:47
  */

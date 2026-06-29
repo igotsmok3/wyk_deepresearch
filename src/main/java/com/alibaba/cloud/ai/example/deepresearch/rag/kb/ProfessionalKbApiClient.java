@@ -22,7 +22,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 专业知识库API客户端接口
+ * 专业知识库 API 客户端接口，定义查询、提供商标识及可用性检测的统一契约。
+ *
+ * <p>项目职责：知识库接入层的核心抽象，屏蔽不同知识库服务的 API 差异，
+ * 使上层策略可以一致地调用各种知识库；实现类由 ProfessionalKbApiClientFactory 根据配置动态创建。
+ *
+ * <p>被使用情况：由 CustomKbApiClient（通用 REST）和 DashScopeKbApiClient（DashScope）实现；
+ * ProfessionalKbApiClientFactory 负责创建实例，ProfessionalKbApiStrategy 持有并调用本接口进行检索。
  *
  * @author hupei
  */

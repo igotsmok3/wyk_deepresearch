@@ -22,10 +22,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
 
 /**
+ * 对话流式请求体，包含会话标识、计划控制参数、搜索配置及用户输入等所有前端请求字段。
+ *
+ * <p>项目职责：作为 {@code POST /chat/stream} 接口的请求体，
+ * 携带用户问题、会话 ID、最大迭代次数、搜索引擎选择等控制参数，
+ * 经 {@code ChatRequestProcess} 填充默认值后传入图执行流程。
+ *
+ * <p>被使用情况：{@code ChatController} 接收并处理该请求；
+ * {@code ChatRequestProcess} 补全默认值并将字段写入图状态 Map；
+ * {@code GraphProcess} 读取 {@code sessionId} 等字段管理图任务生命周期。
+ *
  * @author yingzi
  * @since 2025/5/27 15:52
  */
-
 public record ChatRequest(
 
 		/**

@@ -17,7 +17,15 @@
 package com.alibaba.cloud.ai.example.deepresearch.model.multiagent;
 
 /**
- * Agent类型枚举，定义不同类型的研究Agent
+ * 研究 Agent 类型枚举，定义系统支持的各领域专业 Agent 及其关联的 Prompt 和引用规范。
+ *
+ * <p>项目职责：每个枚举值对应一个专领域 Agent（学术研究、生活旅游、百科、数据分析、通用研究），
+ * 携带该 Agent 的描述、Prompt 文件路径和参考资料格式指引，驱动多 Agent 路由策略。
+ *
+ * <p>被使用情况：{@code QuestionClassifierService} 根据问题分类返回对应枚举；
+ * {@code AgentPromptTemplateUtil} 根据枚举加载对应 Prompt 文件；
+ * {@code AgentsConfiguration} 为每个枚举值构建独立的 ChatClient Bean；
+ * {@code SearchPlatform} 通过 {@code supportedAgents} 关联各平台适用的 Agent 类型。
  *
  * @author Makoto
  * @since 2025/07/17

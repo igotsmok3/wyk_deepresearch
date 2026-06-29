@@ -18,6 +18,14 @@ package com.alibaba.cloud.ai.example.deepresearch.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * 通用 API 响应封装，统一包装 HTTP 接口的返回结构。
+ *
+ * <p>项目职责：作为各 REST 接口的标准响应体，携带状态码、状态文本、消息和泛型数据字段。
+ *
+ * <p>被使用情况：{@code ChatController} 用于停止图任务的响应；{@code RagDataController} 用于文件上传接口响应；
+ * {@code ShortUserRoleMemoryController} 用于短期记忆查询、删除接口响应。
+ */
 public record ApiResponse<T>(
 
 		@JsonProperty("code") Integer code,

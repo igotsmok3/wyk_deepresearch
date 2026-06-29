@@ -18,6 +18,15 @@ package com.alibaba.cloud.ai.example.deepresearch.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/**
+ * 前端路由重定向控制器，将根路径及 Vue 应用路由统一转发到前端入口页面。
+ *
+ * <p>项目职责：controller 层的 SPA 兼容层，负责将 {@code /}、{@code /ui}、
+ * {@code /ui/chat/**} 等路径映射到 {@code /ui/index.html}，使前端 Vue Router 的
+ * History 模式在页面刷新时不会返回 404。
+ *
+ * <p>被使用情况：由 Spring 容器直接管理，无其他 Java 类直接引用。
+ */
 @Controller
 public class RedirectController {
 

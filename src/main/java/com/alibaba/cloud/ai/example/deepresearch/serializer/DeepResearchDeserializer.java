@@ -27,6 +27,16 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * {@code OverAllState} 的自定义 JSON 反序列化器，负责将持久化的图状态 JSON 正确还原为领域对象。
+ *
+ * <p>项目职责：在 {@code DeepResearchStateSerializer} 的反序列化阶段处理类型擦除问题，
+ * 将 JSON 中的 {@code current_plan} 节点还原为 {@code Plan} 对象，
+ * 将 {@code search_engine} 节点还原为 {@code SearchEnum} 枚举，其余字段原样保留。
+ *
+ * <p>被使用情况：由 {@code DeepResearchStateSerializer} 在构造时注册到 Jackson {@code SimpleModule}，
+ * 在图状态从检查点存储恢复时自动触发。
+ */
 public class DeepResearchDeserializer extends JsonDeserializer<OverAllState> {
 
 	private final ObjectMapper objectMapper;

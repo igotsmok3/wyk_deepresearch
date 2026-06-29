@@ -32,7 +32,16 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * 智能Agent调度器，根据问题分类结果将任务分配给对应的Agent
+ * 智能 Agent 调度服务，将问题分类、搜索平台选择和 Agent 路由整合为单一入口。
+ *
+ * <p>项目职责：协调 {@code QuestionClassifierService} 和 {@code SearchPlatformSelectionService}，
+ * 根据问题分类结果选择对应专属 ChatClient（学术/生活旅游/百科/数据分析/通用），
+ * 并将选中的 Agent、AgentType、搜索平台列表及搜索策略描述封装为 {@code AgentDispatchResult}
+ * 返回；任何异常均回退到通用研究 Agent，保证主流程不中断。
+ * 仅在 smart-agents 功能开启时注册为 Bean。
+ *
+ * <p>被使用情况：被 {@code SmartAgentSelectionHelperService} 和 {@code ResearcherNode} 注入，
+ * 在研究节点执行时做智能 Agent 分派；也通过 {@code AgentIntegrationUtil} 间接引用。
  *
  * @author Makoto
  * @since 2025/07/17

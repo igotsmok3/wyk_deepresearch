@@ -22,7 +22,14 @@ import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
 import java.util.Collections;
 
 /**
- * Utility class for registering parallel node step titles into the state.
+ * 并行节点步骤标题注册工具类，将节点类型和步骤标题写入图全局状态，用于前端进度展示。
+ *
+ * <p>项目职责：在并行执行节点（ResearcherNode、CoderNode）开始处理任务时，
+ * 向 {@code OverAllState} 注册形如 {@code researcher_0_step_title} 的键值对，
+ * 以便 SSE 流将当前步骤信息推送给前端展示，支持"[反思]"前缀标记反思轮次。
+ *
+ * <p>被使用情况：{@code ResearcherNode} 和 {@code CoderNode} 在构建流式生成器前
+ * 调用 {@code registerStepTitle} 注册步骤标题，返回值作为 StreamingChatGenerator 的起始节点名。
  */
 public class NodeStepTitleUtil {
 

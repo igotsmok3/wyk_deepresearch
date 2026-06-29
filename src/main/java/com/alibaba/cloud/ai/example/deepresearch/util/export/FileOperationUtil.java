@@ -31,7 +31,13 @@ import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
 /**
- * 文件操作工具类，提供基础的文件读写功能
+ * 文件操作工具类，提供报告文件的读写、目录创建、文件名生成及 HTTP 下载响应封装等基础能力。
+ *
+ * <p>项目职责：集中管理 DeepResearch 导出模块的文件 I/O 操作，包括将 Markdown 内容持久化到磁盘、
+ * 生成规范化文件名（过滤非法字符）以及构造 Spring MVC {@code ResponseEntity<Resource>} 下载响应。
+ *
+ * <p>被使用情况：{@code ExportService} 用于保存报告文件、生成文件名、检查文件是否存在及构建下载响应；
+ * {@code AsyncExportUtil} 用于生成 PDF 文件名及路径。
  *
  * @author sixiyida
  * @since 2025/6/20

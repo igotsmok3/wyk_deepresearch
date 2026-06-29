@@ -24,7 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Configuration properties for RAG (Retrieval Augmented Generation) functionality.
+ * RAG（检索增强生成）功能的配置属性类，绑定 {@code spring.ai.alibaba.deepresearch.rag.*} 前缀的配置项。
+ *
+ * <p>项目职责：属于配置层，统一管理 RAG 相关的所有配置，包括功能开关、向量存储类型（简单内存/Elasticsearch）、
+ * 检索管道参数（TopK、相似度阈值、重排序）、文本分割参数、专业知识库列表及数据加载路径等。
+ * 内部嵌套多个静态配置类（{@code Simple}、{@code Pipeline}、{@code Elasticsearch}、{@code Data}、
+ * {@code ProfessionalKnowledgeBases}、{@code TextSplitter}）对各功能域进行分组管理。
+ *
+ * <p>被使用情况：被 {@code DeepResearchConfiguration}、{@code RagVectorStoreConfiguration}、
+ * {@code RagDataAutoConfiguration} 注入使用，是 RAG 子系统的核心配置数据来源。
  *
  * @author hupei
  */

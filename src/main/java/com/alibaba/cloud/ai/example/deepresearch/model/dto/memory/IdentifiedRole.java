@@ -6,6 +6,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
+ * 用户角色识别结果数据模型，描述从对话中推断出的用户身份及其置信度。
+ *
+ * <p>项目职责：作为短期记忆提取结果的子结构，存储可能的身份列表、角色特征、
+ * 证据摘要和置信度等级，供后续个性化处理使用。
+ *
+ * <p>被使用情况：{@code ShortUserRoleExtractResult} 持有该对象作为字段 {@code identifiedRole}。
+ *
  * @author benym
  */
 public class IdentifiedRole {

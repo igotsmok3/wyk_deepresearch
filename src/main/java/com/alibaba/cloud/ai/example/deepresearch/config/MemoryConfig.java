@@ -10,6 +10,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * 对话窗口记忆配置类，仅在 {@code spring.ai.alibaba.deepresearch.short-term-memory.enabled=true} 时生效。
+ *
+ * <p>项目职责：属于配置层，创建 {@code MessageWindowChatMemory} Bean，
+ * 底层使用 {@code InMemoryChatMemoryRepository} 按 sessionId 存储 User/Assistant 消息轮次，
+ * 超出 {@code maxMessages} 限制时自动丢弃最旧消息（滑动窗口），为多轮对话提供短期记忆能力。
+ *
+ * <p>被使用情况：产出的 {@code MessageWindowChatMemory} Bean 被 {@code CoordinatorNode} 和
+ * {@code ReporterNode} 注入，用于在节点执行时维护并查询多轮对话历史。
+ *
  * @author benym
  */
 @Configuration

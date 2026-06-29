@@ -27,9 +27,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Controller for managing RAG data, including document uploads.
+ * RAG 知识库数据管理控制器，提供文档上传与向量化入库的 REST 接口。
  *
- * @author hupei
+ * <p>项目职责：controller 层的数据管理入口，对外暴露单文件上传、批量用户文件上传以及
+ * 专业知识库文件导入等接口，委托
+ * {@link com.alibaba.cloud.ai.example.deepresearch.service.VectorStoreDataIngestionService}
+ * 完成文档解析、分块和向量存储。
+ *
+ * <p>被使用情况：由 Spring 容器直接管理，无其他 Java 类直接引用。
  */
 @RestController
 @RequestMapping("/api/rag/")

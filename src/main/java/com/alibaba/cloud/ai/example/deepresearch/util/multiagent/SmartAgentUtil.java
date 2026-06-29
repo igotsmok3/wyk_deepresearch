@@ -27,7 +27,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 智能Agent系统通用工具类 整合开关检查、类型转换、状态管理等通用逻辑
+ * 智能 Agent 系统通用工具类，整合搜索平台解析、类型转换、策略描述和状态更新等通用逻辑。
+ *
+ * <p>项目职责：为多智能 Agent 子系统提供无状态工具方法集合，包括：AI 分类结果解析、
+ * 搜索平台字符串解析、{@code SearchPlatform} 与 {@code SearchEnum} 互转、
+ * 搜索引擎可用性检查、工具调用平台判断以及 Agent 状态更新 Map 构建；
+ * 同时内嵌 {@code SearchSelectionResult} 值对象封装搜索决策结果。
+ *
+ * <p>被使用情况：{@code SmartAgentSelectionHelperService}、{@code SearchPlatformSelectionService}、
+ * {@code QuestionClassifierService}、{@code SearchInfoService}、{@code BackgroundInvestigationNode}
+ * 及 {@code AgentDispatchResult} 均调用本类的静态方法完成智能 Agent 选择流程中的各类转换与判断。
  *
  * @author Makoto
  * @since 2025/07/17
@@ -113,9 +122,8 @@ public class SmartAgentUtil {
 	}
 
 	/**
-	 * 将SearchPlatform转换为SearchEnum
-	 * @param platform 搜索平台枚举
-	 * @return 对应的SearchEnum
+	 * 将 SearchPlatform 转换为 SearchEnum（传统搜索引擎用）。
+	 * 专用工具调用平台（OpenAlex 等）返回 null，调用方应先通过 isToolCallingPlatform() 判断。
 	 */
 	public static SearchEnum convertToSearchEnum(SearchPlatform platform) {
 		return switch (platform) {
@@ -123,16 +131,14 @@ public class SmartAgentUtil {
 			case ALIYUN_AI_SEARCH -> SearchEnum.ALIYUN;
 			case BAIDU_SEARCH -> SearchEnum.BAIDU;
 			case SERPAPI -> SearchEnum.SERPAPI;
-
-			// 专用工具调用映射 - 返回null表示需要使用工具调用搜索
+			// 专用工具调用平台无对应 SearchEnum，返回 null
 			case OPENALEX, OPENTRIPMAP, TRIPADVISOR, WIKIPEDIA, WORLDBANK_DATA, GOOGLE_SCHOLAR -> null;
 		};
 	}
 
 	/**
-	 * 检查是否为工具调用平台
-	 * @param platform 搜索平台
-	 * @return true表示是工具调用平台
+	 * 判断是否为需要走 ToolCallingSearchService 的专用领域平台。
+	 * 这些平台不走 SearchFilterService 过滤管线，直接调用对应 SearchService bean。
 	 */
 	public static boolean isToolCallingPlatform(SearchPlatform platform) {
 		return platform != null && switch (platform) {

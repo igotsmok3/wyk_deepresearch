@@ -15,26 +15,32 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
+ * {@link ShortTermMemoryRepository} 的纯内存实现，使用三个并发 Map 分层管理用户提问历史和角色画像。
+ *
+ * <p>项目职责：维护三个独立的 ConcurrentHashMap：
+ * (1) {@code userQueryMemory}（key=conversationId）存每次用户提问原文；
+ * (2) {@code shortTermMemoryTrack}（key=userId:conversationId）存 LLM 每次抽取的完整画像历史；
+ * (3) {@code shortTermMemory}（key=userId:conversationId）只保留最新一次画像，供快速比对置信度。
+ * 默认实现，当 Redis 未启用时由 Spring 注入各依赖方。
+ *
+ * <p>被使用情况：作为 {@code ShortTermMemoryRepository} 的默认 Bean，被 {@code ShortUserRoleMemoryNode}、
+ * {@code RewriteAndMultiQueryNode} 和 {@code ShortUserRoleMemoryController} 通过接口注入使用。
+ *
  * @author benym
  */
 @Component
 public class ShortUserRoleExtractInMemory implements ShortTermMemoryRepository {
 
-	/**
-	 * 存储用户查询记忆
-	 */
+	// key=conversationId，存用户每轮提问的原文，带 create_time 元数据用于按时间排序
 	Map<String, List<UserMessage>> userQueryMemory = new ConcurrentHashMap<>();
 
-	/**
-	 * 存储用户角色提取轨迹
-	 */
+	// key=userId:conversationId，存每次 LLM 提取的角色画像（JSON 序列化为 SystemMessage），是完整历史轨迹
 	Map<String, List<Message>> shortTermMemoryTrack = new ConcurrentHashMap<>();
 
-	/**
-	 * 存储用户角色提取结果, 仅保存最近一条
-	 */
+	// key=userId:conversationId，只保留最新一次角色画像，供 ShortUserRoleMemoryNode 快速比对置信度
 	Map<String, Message> shortTermMemory = new ConcurrentHashMap<>();
 
+	// userId + conversationId 组合成唯一 key，隔离不同用户的不同会话
 	private String buildKey(String userId, String conversationId) {
 		return userId + ":" + conversationId;
 	}
@@ -104,6 +110,7 @@ public class ShortUserRoleExtractInMemory implements ShortTermMemoryRepository {
 		Assert.hasText(conversationId, "conversationId cannot be null or empty");
 		Assert.notNull(messages, "messages cannot be null");
 		List<Message> trackMessages = shortTermMemoryTrack.get(buildKey(userId, conversationId));
+		// Track 追加新记录（完整历史），shortTermMemory 始终覆盖为最新一条（快速查询用）
 		if (!CollectionUtils.isEmpty(trackMessages)) {
 			trackMessages.addAll(messages);
 			shortTermMemoryTrack.put(buildKey(userId, conversationId), trackMessages);

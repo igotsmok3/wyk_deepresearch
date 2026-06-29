@@ -19,7 +19,15 @@ package com.alibaba.cloud.ai.example.deepresearch.model.multiagent;
 import java.util.List;
 
 /**
- * 搜索平台枚举，定义不同主题对应的搜索平台
+ * 搜索平台枚举，定义各领域专用及通用的搜索平台及其适用的 Agent 类型。
+ *
+ * <p>项目职责：枚举值描述平台标识码、中文名称、用途说明及对应的 {@code AgentType} 列表，
+ * 用于多 Agent 路由时为不同 Agent 匹配最合适的搜索数据源。
+ *
+ * <p>被使用情况：{@code SearchPlatformSelectionService} 根据 AgentType 选择主搜索平台；
+ * {@code SmartAgentUtil} 解析 AI 返回的平台名称并进行枚举转换；
+ * {@code ToolCallingSearchService} 根据平台类型调用对应的工具搜索服务；
+ * {@code SearchInfoService} 通过该枚举决定具体的搜索执行逻辑。
  *
  * @author Makoto
  * @since 2025/07/17

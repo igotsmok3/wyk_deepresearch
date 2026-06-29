@@ -40,10 +40,25 @@ import java.util.Map;
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
 
 /**
+ * 协调节点：判断用户请求属于简单对话还是需要深度研究，并决定图流程的下一跳。
+ *
+ * <p>项目职责：图流程中 short_user_role_memory 之后的第一个决策节点。从 OverAllState 读取
+ * {@code query} 和 {@code session_id}，按顺序组装：用户角色画像、coordinator 系统提示词、
+ * 多轮对话历史（MessageWindowChatMemory）和当前用户提问，然后调用 coordinatorAgent。
+ * LLM 以工具调用方式表达"需要深度研究"的意图。写入 OverAllState：
+ * <ul>
+ *   <li>{@code coordinator_next_node}：路由键，触发工具调用时为 rewrite_multi_query，否则为 END</li>
+ *   <li>{@code deep_research}：是否进入深度研究流程</li>
+ *   <li>{@code output}：直接回答内容（仅简单对话时写入）</li>
+ * </ul>
+ *
+ * <p>被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code coordinator} 注册到图中；
+ * {@code CoordinatorDispatcher} 读取 {@code coordinator_next_node} 进行边路由；
+ * {@code MemoryConfig} 创建的 {@code MessageWindowChatMemory} Bean 注入本节点。
+ *
  * @author yingzi
  * @since 2025/5/18 16:38
  */
-
 public class CoordinatorNode implements NodeAction {
 
 	private static final Logger logger = LoggerFactory.getLogger(CoordinatorNode.class);
@@ -68,12 +83,16 @@ public class CoordinatorNode implements NodeAction {
 	public Map<String, Object> apply(OverAllState state) throws Exception {
 		logger.info("coordinator node is running.");
 		List<Message> messages = new ArrayList<>();
-		// 1. 添加消息
-		// 1.1 添加预置提示消息
+
+		// ① 注入用户角色画像（由 ShortUserRoleMemoryNode 写入 OverAllState）
+		//    形如："You are having a conversation with [用户职业概述]"，让 coordinator 了解用户背景
 		TemplateUtil.addShortUserRoleMemory(messages, state);
+
+		// ② 注入 coordinator 角色的系统提示词（从 prompts/coordinator.md 加载）
 		messages.add(TemplateUtil.getMessage("coordinator"));
 
-		// 添加历史消息UserMessage和AssistantMessage交替
+		// ③ 注入多轮对话历史（MessageWindowChatMemory，按 sessionId 存储 User/Assistant 轮次）
+		//    这是跨请求的对话记忆，让 coordinator 知道本次 session 之前聊了什么
 		String sessionId = StateUtil.getSessionId(state);
 		boolean enabledShortTermMemory = shortTermMemoryProperties.isEnabled();
 		if (enabledShortTermMemory) {
@@ -82,7 +101,8 @@ public class CoordinatorNode implements NodeAction {
 				messages.addAll(sessionHistoryMemory);
 			}
 		}
-		// 1.2 添加用户提问
+
+		// ④ 添加本轮用户提问，并立即存入 MessageWindowChatMemory（无论本轮是否触发深度研究都要存）
 		UserMessage userMessage = new UserMessage(StateUtil.getQuery(state));
 		if (enabledShortTermMemory) {
 			messageWindowChatMemory.add(sessionId, userMessage);
@@ -90,23 +110,24 @@ public class CoordinatorNode implements NodeAction {
 		messages.add(userMessage);
 		logger.debug("Current Coordinator messages: {}", messages);
 
-		// 发起调用并获取完整响应
+		// 调用 coordinator LLM，判断是简单对话还是需要深度研究
 		ChatResponse response = coordinatorAgent.prompt().messages(messages).call().chatResponse();
 
 		String nextStep = END;
 		boolean deepResearch = false;
 		Map<String, Object> updated = new HashMap<>();
 
-		// 获取 assistant 消息内容
 		assert response != null;
 		AssistantMessage assistantMessage = response.getResult().getOutput();
-		// 判断是否触发工具调用
+		// coordinator 通过工具调用来表达"需要深度研究"的意图
 		if (assistantMessage.getToolCalls() != null && !assistantMessage.getToolCalls().isEmpty()) {
 			logger.info("✅ 工具已调用: " + assistantMessage.getToolCalls());
 			nextStep = "rewrite_multi_query";
 			deepResearch = true;
+			// 触发深度研究时不保存 assistant 回复，因为最终回复会由 reporter 生成
 		}
 		else {
+			// 直接回答（无需深度研究），将 assistant 回复也存入 MessageWindowChatMemory，维护完整对话历史
 			logger.warn("❌ 未触发工具调用");
 			logger.debug("Coordinator response: {}", response.getResult());
 			AssistantMessage output = response.getResult().getOutput();

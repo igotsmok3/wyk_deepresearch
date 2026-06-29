@@ -30,10 +30,21 @@ import org.springframework.util.StringUtils;
 import java.util.Map;
 
 /**
+ * 并行执行分配节点：为研究计划中尚未开始的步骤分配具体的 researcher/coder 执行者角色。
+ *
+ * <p>项目职责：位于 research_team 与各并行 researcher/coder 节点之间的调度枢纽。从 OverAllState
+ * 读取 {@code current_plan}，遍历所有步骤并按轮询（round-robin）方式分配：RESEARCH 类型步骤
+ * 分配给 {@code researcher_N}，PROCESSING 类型步骤在所有 RESEARCH 步骤完成后才分配给
+ * {@code coder_N}。分配通过设置 step 的 {@code executionStatus} 字段实现，不向 OverAllState
+ * 写入新键，直接返回空 Map。
+ *
+ * <p>被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code parallel_executor} 注册到图中，
+ * 注入 {@code DeepResearchProperties} 以获取并行节点数量配置；
+ * {@code ResearchTeamDispatcher} 在判断步骤未全部完成时路由到本节点。
+ *
  * @author sixiyida
  * @since 2025/6/12
  */
-
 public class ParallelExecutorNode implements NodeAction {
 
 	private static final Logger logger = LoggerFactory.getLogger(ParallelExecutorNode.class);

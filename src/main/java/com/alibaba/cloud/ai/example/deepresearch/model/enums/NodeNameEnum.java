@@ -17,7 +17,13 @@
 package com.alibaba.cloud.ai.example.deepresearch.model.enums;
 
 /**
- * StateGraph 节点枚举，统一管理所有流程节点名称，和给前端渲染的节点title。
+ * StateGraph 节点名称枚举，统一管理所有流程节点的内部名称及对应的前端展示标题。
+ *
+ * <p>项目职责：集中定义图中全部节点的字符串标识，避免硬编码分散，
+ * 同时提供前端友好的 displayTitle 供 SSE 事件渲染使用。
+ *
+ * <p>被使用情况：{@code GraphProcess} 通过 {@code fromNodeName} 和 {@code getDisplayTitleByNodeName}
+ * 将节点名称映射为前端展示标题。
  */
 public enum NodeNameEnum {
 
