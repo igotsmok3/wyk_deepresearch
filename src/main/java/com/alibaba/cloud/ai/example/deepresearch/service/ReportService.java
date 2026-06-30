@@ -19,13 +19,14 @@ package com.alibaba.cloud.ai.example.deepresearch.service;
 /**
  * 报告存储服务接口，定义以 threadId 为键的报告增删查操作契约。
  *
- * <p>项目职责：抽象报告的持久化行为，与具体存储媒介解耦；
- * 上层组件只依赖本接口，存储实现可按配置在内存和 Redis 之间切换。
+ * <p>
+ * 项目职责：抽象报告的持久化行为，与具体存储媒介解耦； 上层组件只依赖本接口，存储实现可按配置在内存和 Redis 之间切换。
  *
- * <p>被使用情况：由 {@link ReportMemoryService}（内存实现，默认）和
- * {@link ReportRedisService}（Redis 实现，需开启 {@code spring.data.redis.enabled=true}）
- * 实现；被 {@code ReporterNode}、{@code ExportService}、{@code InMemorySessionContextService}
- * 和 {@code ReportController} 使用。
+ * <p>
+ * 被使用情况：由 {@link ReportMemoryService}（内存实现，默认）和 {@link ReportRedisService}（Redis 实现，需开启
+ * {@code spring.data.redis.enabled=true}） 实现；被
+ * {@code ReporterNode}、{@code ExportService}、{@code InMemorySessionContextService} 和
+ * {@code ReportController} 使用。
  *
  * @author huangzhen
  * @since 2025/6/20

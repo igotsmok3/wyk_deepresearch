@@ -27,12 +27,14 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 /**
  * Redis 配置类，负责在 Redis 启用时创建 {@code RedisTemplate<String, Object>} Bean。
  *
- * <p>项目职责：属于配置层，仅在 {@code spring.data.redis.enabled=true} 时生效。
- * 配置 {@code RedisTemplate} 的键序列化器（{@code StringRedisSerializer}）和
+ * <p>
+ * 项目职责：属于配置层，仅在 {@code spring.data.redis.enabled=true} 时生效。 配置 {@code RedisTemplate}
+ * 的键序列化器（{@code StringRedisSerializer}）和
  * 值序列化器（{@code GenericJackson2JsonRedisSerializer}），为需要持久化缓存的功能提供 Redis 访问能力。
  *
- * <p>被使用情况：由 Spring 容器直接管理；产出的 {@code RedisTemplate} Bean 被
- * 项目中启用 Redis 存储的服务类（如短期记忆 Redis 实现等）注入使用。
+ * <p>
+ * 被使用情况：由 Spring 容器直接管理；产出的 {@code RedisTemplate} Bean 被 项目中启用 Redis 存储的服务类（如短期记忆 Redis
+ * 实现等）注入使用。
  *
  * @author huangzhen
  * @since 2025/6/18

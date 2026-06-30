@@ -34,17 +34,19 @@ import static com.alibaba.cloud.ai.graph.StateGraph.END;
 /**
  * 信息解析节点：将 PlannerNode 流式输出的 JSON 计划字符串反序列化为 {@code Plan} 对象，并决定后续路由。
  *
- * <p>项目职责：位于 planner 之后，连接规划输出与执行阶段。从 OverAllState 读取
- * {@code planner_content}，使用 {@code BeanOutputConverter} 将其转换为 {@code Plan}。
- * 反序列化失败时若未超过最大迭代次数则重新路由到 planner；成功后根据
+ * <p>
+ * 项目职责：位于 planner 之后，连接规划输出与执行阶段。从 OverAllState 读取 {@code planner_content}，使用
+ * {@code BeanOutputConverter} 将其转换为 {@code Plan}。 反序列化失败时若未超过最大迭代次数则重新路由到 planner；成功后根据
  * {@code auto_accepted_plan} 决定是否跳过人工确认。写入 OverAllState：
  * <ul>
- *   <li>{@code current_plan}：反序列化后的计划对象</li>
- *   <li>{@code information_next_node}：路由键，取值为 human_feedback、research_team、planner 或 END</li>
- *   <li>{@code plan_iterations}：自动接受计划时迭代计数 +1</li>
+ * <li>{@code current_plan}：反序列化后的计划对象</li>
+ * <li>{@code information_next_node}：路由键，取值为 human_feedback、research_team、planner 或
+ * END</li>
+ * <li>{@code plan_iterations}：自动接受计划时迭代计数 +1</li>
  * </ul>
  *
- * <p>被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code information} 注册到图中；
+ * <p>
+ * 被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code information} 注册到图中；
  * {@code InformationDispatcher} 读取 {@code information_next_node} 进行边路由。
  *
  * @author yingzi

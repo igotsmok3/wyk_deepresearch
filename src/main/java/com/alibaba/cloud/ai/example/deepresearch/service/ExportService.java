@@ -37,12 +37,13 @@ import java.util.regex.Pattern;
 /**
  * 报告导出服务，负责将 Markdown 报告转换为不同格式并落盘。
  *
- * <p>项目职责：支持 Markdown 和 PDF 两种导出格式。Markdown 直接写文件，PDF 经由
- * Markdown → HTML → PDF 两步转换。文件名默认使用 threadId，若报告含一级标题则以标题
- * 作为下载文件名（UTF-8 编码）。导出根目录由 ExportProperties.path 配置。
+ * <p>
+ * 项目职责：支持 Markdown 和 PDF 两种导出格式。Markdown 直接写文件，PDF 经由 Markdown → HTML → PDF 两步转换。文件名默认使用
+ * threadId，若报告含一级标题则以标题 作为下载文件名（UTF-8 编码）。导出根目录由 ExportProperties.path 配置。
  *
- * <p>被使用情况：被 {@code ReportController} 调用，用于响应报告下载请求；
- * 由 {@code ExportConfiguration} 以工厂方法方式创建 Bean，注入配置路径。
+ * <p>
+ * 被使用情况：被 {@code ReportController} 调用，用于响应报告下载请求； 由 {@code ExportConfiguration} 以工厂方法方式创建
+ * Bean，注入配置路径。
  *
  * @author sixiyida
  * @since 2025/6/20

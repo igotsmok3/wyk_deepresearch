@@ -26,12 +26,14 @@ import java.util.List;
 /**
  * RAG（检索增强生成）功能的配置属性类，绑定 {@code spring.ai.alibaba.deepresearch.rag.*} 前缀的配置项。
  *
- * <p>项目职责：属于配置层，统一管理 RAG 相关的所有配置，包括功能开关、向量存储类型（简单内存/Elasticsearch）、
+ * <p>
+ * 项目职责：属于配置层，统一管理 RAG 相关的所有配置，包括功能开关、向量存储类型（简单内存/Elasticsearch）、
  * 检索管道参数（TopK、相似度阈值、重排序）、文本分割参数、专业知识库列表及数据加载路径等。
  * 内部嵌套多个静态配置类（{@code Simple}、{@code Pipeline}、{@code Elasticsearch}、{@code Data}、
  * {@code ProfessionalKnowledgeBases}、{@code TextSplitter}）对各功能域进行分组管理。
  *
- * <p>被使用情况：被 {@code DeepResearchConfiguration}、{@code RagVectorStoreConfiguration}、
+ * <p>
+ * 被使用情况：被 {@code DeepResearchConfiguration}、{@code RagVectorStoreConfiguration}、
  * {@code RagDataAutoConfiguration} 注入使用，是 RAG 子系统的核心配置数据来源。
  *
  * @author hupei
@@ -91,6 +93,31 @@ public class RagProperties {
 	 */
 	private final TextSplitter textSplitter = new TextSplitter();
 
+	/**
+	 * Milvus向量存储配置
+	 */
+	private final Milvus milvus = new Milvus();
+
+	/**
+	 * Markdown结构感知切分配置
+	 */
+	private final MarkdownSplitter markdownSplitter = new MarkdownSplitter();
+
+	/**
+	 * PDF结构感知切分配置
+	 */
+	private final PdfSplitter pdfSplitter = new PdfSplitter();
+
+	/**
+	 * MinerU PDF精准解析配置。
+	 */
+	private final MinerU minerU = new MinerU();
+
+	/**
+	 * 用户会话文件的TTL天数，默认7天。
+	 */
+	private int userFileTtlDays = 7;
+
 	// Getters
 	public Data getData() {
 		return data;
@@ -146,6 +173,30 @@ public class RagProperties {
 
 	public TextSplitter getTextSplitter() {
 		return textSplitter;
+	}
+
+	public Milvus getMilvus() {
+		return milvus;
+	}
+
+	public MarkdownSplitter getMarkdownSplitter() {
+		return markdownSplitter;
+	}
+
+	public PdfSplitter getPdfSplitter() {
+		return pdfSplitter;
+	}
+
+	public MinerU getMinerU() {
+		return minerU;
+	}
+
+	public int getUserFileTtlDays() {
+		return userFileTtlDays;
+	}
+
+	public void setUserFileTtlDays(int userFileTtlDays) {
+		this.userFileTtlDays = userFileTtlDays;
 	}
 
 	/**
@@ -854,6 +905,460 @@ public class RagProperties {
 
 		public void setDebugMode(boolean debugMode) {
 			this.debugMode = debugMode;
+		}
+
+	}
+
+	/**
+	 * Milvus向量存储配置。
+	 */
+	public static class Milvus {
+
+		/**
+		 * Milvus服务主机地址，默认为"localhost"。
+		 */
+		private String host = "localhost";
+
+		/**
+		 * Milvus服务端口，默认为19530。
+		 */
+		private int port = 19530;
+
+		/**
+		 * Milvus数据库名称，默认为"default"。
+		 */
+		private String databaseName = "default";
+
+		/**
+		 * Milvus集合名称，默认为"deepresearch_vectors"。
+		 */
+		private String collectionName = "deepresearch_vectors";
+
+		/**
+		 * 向量维度，需与Embedding模型输出维度一致，默认1536。
+		 */
+		private int embeddingDimension = 1536;
+
+		/**
+		 * Milvus用户名（可选）。
+		 */
+		private String username;
+
+		/**
+		 * Milvus密码（可选）。
+		 */
+		private String password;
+
+		/**
+		 * Milvus+ES 双路混合检索模式（vector-store-type: milvus-es）专用配置。
+		 */
+		private final DualMode dual = new DualMode();
+
+		public DualMode getDual() {
+			return dual;
+		}
+
+		public String getHost() {
+			return host;
+		}
+
+		public void setHost(String host) {
+			this.host = host;
+		}
+
+		public int getPort() {
+			return port;
+		}
+
+		public void setPort(int port) {
+			this.port = port;
+		}
+
+		public String getDatabaseName() {
+			return databaseName;
+		}
+
+		public void setDatabaseName(String databaseName) {
+			this.databaseName = databaseName;
+		}
+
+		public String getCollectionName() {
+			return collectionName;
+		}
+
+		public void setCollectionName(String collectionName) {
+			this.collectionName = collectionName;
+		}
+
+		public int getEmbeddingDimension() {
+			return embeddingDimension;
+		}
+
+		public void setEmbeddingDimension(int embeddingDimension) {
+			this.embeddingDimension = embeddingDimension;
+		}
+
+		public String getUsername() {
+			return username;
+		}
+
+		public void setUsername(String username) {
+			this.username = username;
+		}
+
+		public String getPassword() {
+			return password;
+		}
+
+		public void setPassword(String password) {
+			this.password = password;
+		}
+
+		/**
+		 * Milvus+ES 双路混合检索模式配置。 仅在 {@code vector-store-type: milvus-es} 时生效，
+		 * 控制两路单独的返回数量、超时及 RRF 融合权重。
+		 */
+		public static class DualMode {
+
+			/**
+			 * ES BM25 单路返回文档数，默认10。
+			 */
+			private int bm25TopK = 10;
+
+			/**
+			 * Milvus 向量单路返回文档数，默认10。
+			 */
+			private int vectorTopK = 10;
+
+			/**
+			 * 单路检索超时（毫秒），超时返回空列表并继续融合，默认3000。
+			 */
+			private int retrievalTimeoutMs = 3000;
+
+			/**
+			 * BM25 结果列表在 RRF 中的权重（扩展用），默认1.0。
+			 */
+			private float bm25RrfWeight = 1.0f;
+
+			/**
+			 * 向量结果列表在 RRF 中的权重（扩展用），默认1.0。
+			 */
+			private float vectorRrfWeight = 1.0f;
+
+			public int getBm25TopK() {
+				return bm25TopK;
+			}
+
+			public void setBm25TopK(int bm25TopK) {
+				this.bm25TopK = bm25TopK;
+			}
+
+			public int getVectorTopK() {
+				return vectorTopK;
+			}
+
+			public void setVectorTopK(int vectorTopK) {
+				this.vectorTopK = vectorTopK;
+			}
+
+			public int getRetrievalTimeoutMs() {
+				return retrievalTimeoutMs;
+			}
+
+			public void setRetrievalTimeoutMs(int retrievalTimeoutMs) {
+				this.retrievalTimeoutMs = retrievalTimeoutMs;
+			}
+
+			public float getBm25RrfWeight() {
+				return bm25RrfWeight;
+			}
+
+			public void setBm25RrfWeight(float bm25RrfWeight) {
+				this.bm25RrfWeight = bm25RrfWeight;
+			}
+
+			public float getVectorRrfWeight() {
+				return vectorRrfWeight;
+			}
+
+			public void setVectorRrfWeight(float vectorRrfWeight) {
+				this.vectorRrfWeight = vectorRrfWeight;
+			}
+
+		}
+
+	}
+
+	/**
+	 * Markdown结构感知切分配置。
+	 */
+	public static class MarkdownSplitter {
+
+		/**
+		 * 是否启用Markdown结构感知切分，默认true。
+		 */
+		private boolean enabled = true;
+
+		/**
+		 * 按标题层级切分的层级深度，默认2（即h1、h2处切断，h3+不切断）。
+		 */
+		private int splitLevel = 2;
+
+		/**
+		 * 每个chunk的最大token数，-1表示继承TextSplitter.maxChunkSize。
+		 */
+		private int maxChunkSize = -1;
+
+		/**
+		 * 是否保持代码块整体不拆断，默认true。
+		 */
+		private boolean keepCodeBlockIntact = true;
+
+		/**
+		 * 是否保持表格整体不拆断，默认true。
+		 */
+		private boolean keepTableIntact = true;
+
+		/**
+		 * 是否在每个chunk的元数据中附加heading路径，默认true。
+		 */
+		private boolean appendHeadingPath = true;
+
+		public boolean isEnabled() {
+			return enabled;
+		}
+
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
+		}
+
+		public int getSplitLevel() {
+			return splitLevel;
+		}
+
+		public void setSplitLevel(int splitLevel) {
+			this.splitLevel = splitLevel;
+		}
+
+		public int getMaxChunkSize() {
+			return maxChunkSize;
+		}
+
+		public void setMaxChunkSize(int maxChunkSize) {
+			this.maxChunkSize = maxChunkSize;
+		}
+
+		public boolean isKeepCodeBlockIntact() {
+			return keepCodeBlockIntact;
+		}
+
+		public void setKeepCodeBlockIntact(boolean keepCodeBlockIntact) {
+			this.keepCodeBlockIntact = keepCodeBlockIntact;
+		}
+
+		public boolean isKeepTableIntact() {
+			return keepTableIntact;
+		}
+
+		public void setKeepTableIntact(boolean keepTableIntact) {
+			this.keepTableIntact = keepTableIntact;
+		}
+
+		public boolean isAppendHeadingPath() {
+			return appendHeadingPath;
+		}
+
+		public void setAppendHeadingPath(boolean appendHeadingPath) {
+			this.appendHeadingPath = appendHeadingPath;
+		}
+
+	}
+
+	/**
+	 * PDF结构感知切分配置。
+	 */
+	public static class PdfSplitter {
+
+		/**
+		 * 是否启用PDF结构感知切分，默认true。
+		 */
+		private boolean enabled = true;
+
+		/**
+		 * 每个chunk的最大token数，-1表示继承TextSplitter.maxChunkSize。
+		 */
+		private int maxChunkSize = -1;
+
+		/**
+		 * 启发式识别标题的字体大小比例阈值（相对于正文字体中位数），默认1.2。
+		 */
+		private float headingFontSizeRatio = 1.2f;
+
+		/**
+		 * 是否提取表格，默认true（当前版本暂不支持，预留配置）。
+		 */
+		private boolean extractTables = true;
+
+		/**
+		 * 表格输出格式，支持markdown或csv，默认markdown。
+		 */
+		private String tableOutputFormat = "markdown";
+
+		public boolean isEnabled() {
+			return enabled;
+		}
+
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
+		}
+
+		public int getMaxChunkSize() {
+			return maxChunkSize;
+		}
+
+		public void setMaxChunkSize(int maxChunkSize) {
+			this.maxChunkSize = maxChunkSize;
+		}
+
+		public float getHeadingFontSizeRatio() {
+			return headingFontSizeRatio;
+		}
+
+		public void setHeadingFontSizeRatio(float headingFontSizeRatio) {
+			this.headingFontSizeRatio = headingFontSizeRatio;
+		}
+
+		public boolean isExtractTables() {
+			return extractTables;
+		}
+
+		public void setExtractTables(boolean extractTables) {
+			this.extractTables = extractTables;
+		}
+
+		public String getTableOutputFormat() {
+			return tableOutputFormat;
+		}
+
+		public void setTableOutputFormat(String tableOutputFormat) {
+			this.tableOutputFormat = tableOutputFormat;
+		}
+
+	}
+
+	/**
+	 * MinerU PDF精准解析配置。
+	 */
+	public static class MinerU {
+
+		private boolean enabled = false;
+
+		private String apiBaseUrl = "https://mineru.net";
+
+		private String apiToken;
+
+		private String modelVersion = "pipeline";
+
+		private boolean enableFormula = true;
+
+		private boolean enableTable = true;
+
+		private String language = "ch";
+
+		private long pollingIntervalMs = 5000L;
+
+		private int maxPollingAttempts = 72;
+
+		private int connectTimeoutMs = 10000;
+
+		private int readTimeoutMs = 60000;
+
+		public boolean isEnabled() {
+			return enabled;
+		}
+
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
+		}
+
+		public String getApiBaseUrl() {
+			return apiBaseUrl;
+		}
+
+		public void setApiBaseUrl(String apiBaseUrl) {
+			this.apiBaseUrl = apiBaseUrl;
+		}
+
+		public String getApiToken() {
+			return apiToken;
+		}
+
+		public void setApiToken(String apiToken) {
+			this.apiToken = apiToken;
+		}
+
+		public String getModelVersion() {
+			return modelVersion;
+		}
+
+		public void setModelVersion(String modelVersion) {
+			this.modelVersion = modelVersion;
+		}
+
+		public boolean isEnableFormula() {
+			return enableFormula;
+		}
+
+		public void setEnableFormula(boolean enableFormula) {
+			this.enableFormula = enableFormula;
+		}
+
+		public boolean isEnableTable() {
+			return enableTable;
+		}
+
+		public void setEnableTable(boolean enableTable) {
+			this.enableTable = enableTable;
+		}
+
+		public String getLanguage() {
+			return language;
+		}
+
+		public void setLanguage(String language) {
+			this.language = language;
+		}
+
+		public long getPollingIntervalMs() {
+			return pollingIntervalMs;
+		}
+
+		public void setPollingIntervalMs(long pollingIntervalMs) {
+			this.pollingIntervalMs = pollingIntervalMs;
+		}
+
+		public int getMaxPollingAttempts() {
+			return maxPollingAttempts;
+		}
+
+		public void setMaxPollingAttempts(int maxPollingAttempts) {
+			this.maxPollingAttempts = maxPollingAttempts;
+		}
+
+		public int getConnectTimeoutMs() {
+			return connectTimeoutMs;
+		}
+
+		public void setConnectTimeoutMs(int connectTimeoutMs) {
+			this.connectTimeoutMs = connectTimeoutMs;
+		}
+
+		public int getReadTimeoutMs() {
+			return readTimeoutMs;
+		}
+
+		public void setReadTimeoutMs(int readTimeoutMs) {
+			this.readTimeoutMs = readTimeoutMs;
 		}
 
 	}

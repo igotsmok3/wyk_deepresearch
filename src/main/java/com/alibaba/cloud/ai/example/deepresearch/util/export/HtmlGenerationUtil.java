@@ -30,12 +30,13 @@ import java.util.List;
 /**
  * HTML 生成工具类，将 Markdown 内容转换为可供 PDF 渲染的完整 XHTML 文档。
  *
- * <p>项目职责：转换链路为 Markdown → HTML 片段（commonmark + TablesExtension）→
- * 包裹样式和字体声明的完整 XHTML；CSS 引用 GitHub Markdown 样式，字体使用阿里巴巴普惠体
- * （均来自 classpath），以保证 PDF 中文渲染效果。
+ * <p>
+ * 项目职责：转换链路为 Markdown → HTML 片段（commonmark + TablesExtension）→ 包裹样式和字体声明的完整 XHTML；CSS 引用
+ * GitHub Markdown 样式，字体使用阿里巴巴普惠体 （均来自 classpath），以保证 PDF 中文渲染效果。
  *
- * <p>被使用情况：{@code FormatConversionUtil} 调用 {@code markdownToHtml} 将 Markdown
- * 转换为 XHTML 中间产物，再交由 openhtmltopdf 渲染为 PDF。
+ * <p>
+ * 被使用情况：{@code FormatConversionUtil} 调用 {@code markdownToHtml} 将 Markdown 转换为 XHTML
+ * 中间产物，再交由 openhtmltopdf 渲染为 PDF。
  *
  * @author sixiyida
  * @since 2025/6/20

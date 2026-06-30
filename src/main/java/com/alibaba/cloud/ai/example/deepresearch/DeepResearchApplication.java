@@ -22,10 +22,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * DeepResearch 应用程序入口类，负责启动 Spring Boot 应用。
  *
- * <p>项目职责：应用层入口，通过 {@code @SpringBootApplication} 触发组件扫描、自动配置和 Bean 注册，
- * 引导整个 AI 深度研究助手后端服务的启动。
+ * <p>
+ * 项目职责：应用层入口，通过 {@code @SpringBootApplication} 触发组件扫描、自动配置和 Bean 注册， 引导整个 AI
+ * 深度研究助手后端服务的启动。
  *
- * <p>被使用情况：无其他类直接引用，由 JVM 通过 {@code main} 方法直接调用以启动应用。
+ * <p>
+ * 被使用情况：无其他类直接引用，由 JVM 通过 {@code main} 方法直接调用以启动应用。
  *
  * @author yingzi
  * @since 2025/5/20 11:01

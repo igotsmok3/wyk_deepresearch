@@ -18,11 +18,13 @@ package com.alibaba.cloud.ai.example.deepresearch.service;
 
 import com.alibaba.cloud.ai.example.deepresearch.config.rag.RagProperties;
 import com.alibaba.cloud.ai.example.deepresearch.rag.SourceTypeEnum;
+import com.alibaba.cloud.ai.example.deepresearch.rag.reader.MinerUDocumentReader;
+import com.alibaba.cloud.ai.example.deepresearch.rag.reader.MinerUParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.document.DocumentTransformer;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
-import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
@@ -33,20 +35,22 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
  * 文档摄入服务，将各类来源的文档解析、切分、元数据富化后写入向量数据库。
  *
- * <p>项目职责：支持三类数据来源——用户上传（携带 session_id、user_id，检索时按会话隔离）、
- * 专业知识库 ES（携带 kb_id、kb_name，session_id 固定为 "professional_kb_es"）和
- * 系统初始化（启动或定时扫描自动摄入）。摄入流程固定为：
- * TikaDocumentReader（多格式解析）→ TokenTextSplitter（分块）→ 元数据富化 → VectorStore.add()。
- * 文本分块参数通过 {@code RagProperties.TextSplitter} 配置化控制。
+ * <p>
+ * 项目职责：支持三类数据来源——用户上传（携带 session_id、user_id，检索时按会话隔离）、 专业知识库 ES（携带
+ * kb_id、kb_name，session_id 固定为 "professional_kb_es"）和 系统初始化（启动或定时扫描自动摄入）。摄入流程固定为：
+ * TikaDocumentReader（多格式解析）→ TokenTextSplitter（分块）→ 元数据富化 → VectorStore.add()。 文本分块参数通过
+ * {@code RagProperties.TextSplitter} 配置化控制。
  *
- * <p>被使用情况：被 {@code RagDataController} 注入，响应用户文件上传和专业知识库文档入库请求；
- * 被 {@code RagDataAutoConfiguration} 在应用启动时自动摄入系统默认文档；
+ * <p>
+ * 被使用情况：被 {@code RagDataController} 注入，响应用户文件上传和专业知识库文档入库请求； 被
+ * {@code RagDataAutoConfiguration} 在应用启动时自动摄入系统默认文档；
  * {@code DefaultHybridRagProcessor}、{@code UserFileRetrievalStrategy} 等检索组件与本类的
  * 元数据字段约定保持一致，实现数据隔离与过滤。
  *
@@ -59,24 +63,24 @@ public class VectorStoreDataIngestionService {
 
 	private final VectorStore vectorStore;
 
-	private final TokenTextSplitter textSplitter;
+	private final DocumentTransformer textSplitter;
 
 	private final RagProperties ragProperties;
 
+	private final MinerUDocumentReader minerUDocumentReader;
+
 	public VectorStoreDataIngestionService(@Qualifier("ragVectorStore") VectorStore vectorStore,
-			RagProperties ragProperties) {
+			RagProperties ragProperties, DocumentSplitterRouter splitterRouter,
+			Optional<MinerUDocumentReader> minerUDocumentReader) {
 		this.vectorStore = vectorStore;
 		this.ragProperties = ragProperties;
+		this.textSplitter = splitterRouter;
+		this.minerUDocumentReader = minerUDocumentReader.orElse(null);
 
-		// 使用配置化的文本分割器
 		RagProperties.TextSplitter splitterConfig = ragProperties.getTextSplitter();
-		this.textSplitter = new TokenTextSplitter(splitterConfig.getDefaultChunkSize(), splitterConfig.getOverlap(),
-				splitterConfig.getMinChunkSizeToSplit(), splitterConfig.getMaxChunkSize(),
-				splitterConfig.isKeepSeparator());
-
 		logger.info(
-				"Initialized VectorStoreDataIngestionService with text splitter config: "
-						+ "chunkSize={}, overlap={}, minChunkSize={}, maxChunkSize={}, keepSeparator={}",
+				"Initialized VectorStoreDataIngestionService with splitter router; "
+						+ "base config: chunkSize={}, overlap={}, minChunkSize={}, maxChunkSize={}, keepSeparator={}",
 				splitterConfig.getDefaultChunkSize(), splitterConfig.getOverlap(),
 				splitterConfig.getMinChunkSizeToSplit(), splitterConfig.getMaxChunkSize(),
 				splitterConfig.isKeepSeparator());
@@ -95,9 +99,25 @@ public class VectorStoreDataIngestionService {
 			}
 
 			logger.info("Ingesting data from resource: {}", resource.getFilename());
-			// TikaDocumentReader 支持多种文档格式(PDF, DOCX, MD, etc.)
-			var documentReader = new TikaDocumentReader(resource);
-			List<Document> documents = documentReader.get();
+			List<Document> documents;
+			String filename = resource.getFilename();
+			if (isMinerUEnabled() && isPdf(filename)) {
+				try {
+					byte[] content = resource.getContentAsByteArray();
+					Map<String, Object> baseMeta = new HashMap<>();
+					if (filename != null) {
+						baseMeta.put("original_filename", filename);
+					}
+					documents = minerUDocumentReader.read(filename, content, baseMeta);
+				}
+				catch (MinerUParseException e) {
+					logger.warn("MinerU failed for {}, falling back to Tika: {}", filename, e.getMessage());
+					documents = readWithTika(resource);
+				}
+			}
+			else {
+				documents = readWithTika(resource);
+			}
 			List<Document> splitDocuments = this.textSplitter.apply(documents);
 			this.vectorStore.add(splitDocuments);
 			logger.info("Successfully ingested {} splits from {}", splitDocuments.size(), resource.getFilename());
@@ -152,9 +172,31 @@ public class VectorStoreDataIngestionService {
 					continue;
 				}
 
-				// 1. 解析文档
-				TikaDocumentReader reader = new TikaDocumentReader(file.getResource());
-				List<Document> documents = reader.get();
+				String filename = file.getOriginalFilename();
+				// 1. 解析文档（PDF 优先走 MinerU，其他格式或 MinerU 失败时走 Tika）
+				List<Document> documents;
+				if (isMinerUEnabled() && isPdf(filename)) {
+					try {
+						Map<String, Object> baseMeta = new HashMap<>();
+						if (filename != null) {
+							baseMeta.put("original_filename", filename);
+						}
+						documents = minerUDocumentReader.read(filename, file.getBytes(), baseMeta);
+					}
+					catch (MinerUParseException e) {
+						logger.warn("MinerU failed for {}, falling back to Tika: {}", filename, e.getMessage());
+						documents = readWithTika(file.getResource());
+						for (Document doc : documents) {
+							doc.getMetadata().putIfAbsent("original_filename", filename);
+						}
+					}
+				}
+				else {
+					documents = readWithTika(file.getResource());
+					for (Document doc : documents) {
+						doc.getMetadata().putIfAbsent("original_filename", filename);
+					}
+				}
 
 				// 2. 分块
 				List<Document> chunks = textSplitter.apply(documents);
@@ -162,15 +204,15 @@ public class VectorStoreDataIngestionService {
 				// 3. 元数据富化
 				AtomicInteger chunkCounter = new AtomicInteger(0);
 				List<Document> enrichedChunks = chunks.stream()
-					.map(chunk -> enrichUserUploadMetadata(chunk, file.getOriginalFilename(), sessionId, userId,
-							uploadTimestamp, chunkCounter.getAndIncrement(), file.getSize(), file.getContentType()))
+					.map(chunk -> enrichUserUploadMetadata(chunk, filename, sessionId, userId, uploadTimestamp,
+							chunkCounter.getAndIncrement(), file.getSize(), file.getContentType()))
 					.collect(Collectors.toList());
 
 				// 4. 存储
 				vectorStore.add(enrichedChunks);
 				totalChunks += enrichedChunks.size();
 
-				logger.info("Successfully uploaded user file {} to vector store: {} chunks", file.getOriginalFilename(),
+				logger.info("Successfully uploaded user file {} to vector store: {} chunks", filename,
 						enrichedChunks.size());
 
 			}
@@ -210,9 +252,31 @@ public class VectorStoreDataIngestionService {
 					continue;
 				}
 
+				String filename = resource.getFilename();
 				// 1. 解析文档
-				TikaDocumentReader reader = new TikaDocumentReader(resource);
-				List<Document> documents = reader.get();
+				List<Document> documents;
+				if (isMinerUEnabled() && isPdf(filename)) {
+					try {
+						Map<String, Object> baseMeta = new HashMap<>();
+						if (filename != null) {
+							baseMeta.put("original_filename", filename);
+						}
+						documents = minerUDocumentReader.read(filename, resource.getContentAsByteArray(), baseMeta);
+					}
+					catch (MinerUParseException e) {
+						logger.warn("MinerU failed for {}, falling back to Tika: {}", filename, e.getMessage());
+						documents = readWithTika(resource);
+						for (Document doc : documents) {
+							doc.getMetadata().putIfAbsent("original_filename", filename);
+						}
+					}
+				}
+				else {
+					documents = readWithTika(resource);
+					for (Document doc : documents) {
+						doc.getMetadata().putIfAbsent("original_filename", filename);
+					}
+				}
 
 				// 2. 分块
 				List<Document> chunks = textSplitter.apply(documents);
@@ -220,15 +284,15 @@ public class VectorStoreDataIngestionService {
 				// 3. 元数据富化
 				AtomicInteger chunkCounter = new AtomicInteger(0);
 				List<Document> enrichedChunks = chunks.stream()
-					.map(chunk -> enrichUserResourceUploadMetadata(chunk, resource.getFilename(), sessionId, userId,
-							uploadTimestamp, chunkCounter.getAndIncrement()))
+					.map(chunk -> enrichUserResourceUploadMetadata(chunk, filename, sessionId, userId, uploadTimestamp,
+							chunkCounter.getAndIncrement()))
 					.collect(Collectors.toList());
 
 				// 4. 存储
 				vectorStore.add(enrichedChunks);
 				totalChunks += enrichedChunks.size();
 
-				logger.info("Successfully uploaded user resource {} to vector store: {} chunks", resource.getFilename(),
+				logger.info("Successfully uploaded user resource {} to vector store: {} chunks", filename,
 						enrichedChunks.size());
 
 			}
@@ -274,6 +338,9 @@ public class VectorStoreDataIngestionService {
 				// 1. 解析文档
 				TikaDocumentReader reader = new TikaDocumentReader(file.getResource());
 				List<Document> documents = reader.get();
+				for (Document doc : documents) {
+					doc.getMetadata().putIfAbsent("original_filename", file.getOriginalFilename());
+				}
 
 				// 2. 分块
 				List<Document> chunks = textSplitter.apply(documents);
@@ -349,6 +416,9 @@ public class VectorStoreDataIngestionService {
 				// 1. 解析文档
 				TikaDocumentReader reader = new TikaDocumentReader(resource);
 				List<Document> documents = reader.get();
+				for (Document doc : documents) {
+					doc.getMetadata().putIfAbsent("original_filename", resource.getFilename());
+				}
 
 				// 2. 分块
 				List<Document> chunks = textSplitter.apply(documents);
@@ -376,6 +446,19 @@ public class VectorStoreDataIngestionService {
 		logger.info("Batch upload resources to professional KB ES completed: kbId={}, totalChunks={}", kbId,
 				totalChunks);
 		return totalChunks;
+	}
+
+	private boolean isMinerUEnabled() {
+		return minerUDocumentReader != null && ragProperties.getMinerU().isEnabled();
+	}
+
+	private static boolean isPdf(String filename) {
+		return filename != null && filename.toLowerCase().endsWith(".pdf");
+	}
+
+	private List<Document> readWithTika(Resource resource) {
+		TikaDocumentReader reader = new TikaDocumentReader(resource);
+		return reader.get();
 	}
 
 	/**
@@ -417,6 +500,11 @@ public class VectorStoreDataIngestionService {
 		}
 
 		metadata.put("session_id", sessionId);
+
+		// TTL：expire_at 为 Unix 秒时间戳，用于定期清理用户临时文件
+		long ttlSeconds = (long) ragProperties.getUserFileTtlDays() * 86400;
+		metadata.put("expire_at", Instant.now().plusSeconds(ttlSeconds).getEpochSecond());
+
 		return new Document(chunk.getId(), chunk.getText(), metadata);
 	}
 
@@ -433,6 +521,10 @@ public class VectorStoreDataIngestionService {
 		if (userId != null && !userId.isBlank()) {
 			metadata.put("user_id", userId);
 		}
+
+		// TTL：expire_at 为 Unix 秒时间戳，用于定期清理用户临时文件
+		long ttlSeconds = (long) ragProperties.getUserFileTtlDays() * 86400;
+		metadata.put("expire_at", Instant.now().plusSeconds(ttlSeconds).getEpochSecond());
 
 		return new Document(chunk.getId(), chunk.getText(), metadata);
 	}

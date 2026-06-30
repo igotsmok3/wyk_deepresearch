@@ -61,12 +61,14 @@ import java.util.Map;
 /**
  * 聊天流式接口控制器，提供基于 SSE 的深度研究对话入口。
  *
- * <p>项目职责：controller 层的核心入口，负责编译 StateGraph、管理 MemorySaver 检查点、
- * 处理首次提问和人工反馈两种请求场景，并通过 SSE 将图执行的流式输出推送到客户端。
- * 支持通过 {@code /chat/stop} 中止运行中的图任务，通过 {@code /chat/resume} 在人工确认计划后恢复执行。
+ * <p>
+ * 项目职责：controller 层的核心入口，负责编译 StateGraph、管理 MemorySaver 检查点、 处理首次提问和人工反馈两种请求场景，并通过 SSE
+ * 将图执行的流式输出推送到客户端。 支持通过 {@code /chat/stop} 中止运行中的图任务，通过 {@code /chat/resume}
+ * 在人工确认计划后恢复执行。
  *
- * <p>被使用情况：由 Spring 容器直接管理，作为 {@code @RestController} 注册到 {@code /chat}
- * 路径；内部实例化 {@link GraphProcess} 和调用 {@link ChatRequestProcess} 完成辅助逻辑。
+ * <p>
+ * 被使用情况：由 Spring 容器直接管理，作为 {@code @RestController} 注册到 {@code /chat} 路径；内部实例化
+ * {@link GraphProcess} 和调用 {@link ChatRequestProcess} 完成辅助逻辑。
  */
 @CrossOrigin(origins = "*")
 @RestController
@@ -83,11 +85,10 @@ public class ChatController {
 
 	/**
 	 * 构造方法——编译 AI 研究图，配置检查点和中断策略。
-	 *
-	 * @param stateGraph              名为 "deepResearch" 的图定义 Bean，由 DeepResearchConfiguration 创建
-	 * @param searchBeanUtil          搜索引擎可用性校验工具
-	 * @param observationRegistry     可观测性注册表（用于链路追踪/指标），可选
-	 * @param deepResearchProperties  项目配置（如最大迭代次数）
+	 * @param stateGraph 名为 "deepResearch" 的图定义 Bean，由 DeepResearchConfiguration 创建
+	 * @param searchBeanUtil 搜索引擎可用性校验工具
+	 * @param observationRegistry 可观测性注册表（用于链路追踪/指标），可选
+	 * @param deepResearchProperties 项目配置（如最大迭代次数）
 	 */
 	@Autowired
 	public ChatController(@Qualifier("deepResearch") StateGraph stateGraph, SearchBeanUtil searchBeanUtil,
@@ -104,7 +105,7 @@ public class ChatController {
 		// ── 编译图 ─────────────────────────────────────────────────────────────
 		// compile() 将节点/边的定义"锁定"成可执行的 CompiledGraph。
 		// interruptBefore("human_feedback")：图执行到 human_feedback 节点之前自动暂停，
-		//   此时前端会收到计划内容，用户可确认或修改，然后调用 /resume 恢复。
+		// 此时前端会收到计划内容，用户可确认或修改，然后调用 /resume 恢复。
 		this.compiledGraph = stateGraph.compile(CompileConfig.builder()
 			.saverConfig(saverConfig)
 			.interruptBefore("human_feedback")
@@ -125,16 +126,17 @@ public class ChatController {
 	/**
 	 * 流式对话接口（SSE），POST /chat/stream。
 	 *
-	 * <p>处理两种场景：
+	 * <p>
+	 * 处理两种场景：
 	 * <ol>
-	 *   <li><b>首次提问</b>：将用户问题写入初始状态，启动图执行，逐节点推送 SSE 事件。</li>
-	 *   <li><b>带反馈的提问</b>：{@code autoAcceptPlan=false} 且携带 {@code interruptFeedback} 时，
-	 *       表示用户在计划确认页面提交了修改意见，此时走人工反馈分支而非重新启动图。</li>
+	 * <li><b>首次提问</b>：将用户问题写入初始状态，启动图执行，逐节点推送 SSE 事件。</li>
+	 * <li><b>带反馈的提问</b>：{@code autoAcceptPlan=false} 且携带 {@code interruptFeedback} 时，
+	 * 表示用户在计划确认页面提交了修改意见，此时走人工反馈分支而非重新启动图。</li>
 	 * </ol>
 	 *
-	 * <p>返回值是 {@code Flux<ServerSentEvent<String>>}，Spring WebFlux 会将其持续推送给客户端，
+	 * <p>
+	 * 返回值是 {@code Flux<ServerSentEvent<String>>}，Spring WebFlux 会将其持续推送给客户端，
 	 * 直到图执行完毕或客户端断开连接。
-	 *
 	 * @param chatRequest 请求体，包含用户问题、搜索引擎选择、是否自动接受计划等参数
 	 */
 	@PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -195,9 +197,8 @@ public class ChatController {
 	/**
 	 * 停止正在执行的图任务，POST /chat/stop。
 	 *
-	 * <p>通过 threadId 找到对应的执行上下文并发出终止信号。
-	 * 返回操作是否成功。
-	 *
+	 * <p>
+	 * 通过 threadId 找到对应的执行上下文并发出终止信号。 返回操作是否成功。
 	 * @param graphId 包含 sessionId 和 threadId 的标识对象
 	 */
 	@PostMapping("/stop")
@@ -209,17 +210,17 @@ public class ChatController {
 	/**
 	 * 恢复被中断的图任务，POST /chat/resume。
 	 *
-	 * <p>调用时机：图在 human_feedback 节点前暂停后，用户在前端确认或修改了研究计划，
-	 * 点击"继续"按钮时前端调用此接口。
+	 * <p>
+	 * 调用时机：图在 human_feedback 节点前暂停后，用户在前端确认或修改了研究计划， 点击"继续"按钮时前端调用此接口。
 	 *
-	 * <p>执行步骤：
+	 * <p>
+	 * 执行步骤：
 	 * <ol>
-	 *   <li>从 MemorySaver 中取出 threadId 对应的状态快照（即暂停时保存的 OverAllState）</li>
-	 *   <li>将用户的反馈（approve/reject + 具体意见）写入状态</li>
-	 *   <li>标记状态为"恢复中"，从初始节点重新进入图（跳过已执行的节点）</li>
-	 *   <li>以 SSE 推送后续节点的输出</li>
+	 * <li>从 MemorySaver 中取出 threadId 对应的状态快照（即暂停时保存的 OverAllState）</li>
+	 * <li>将用户的反馈（approve/reject + 具体意见）写入状态</li>
+	 * <li>标记状态为"恢复中"，从初始节点重新进入图（跳过已执行的节点）</li>
+	 * <li>以 SSE 推送后续节点的输出</li>
 	 * </ol>
-	 *
 	 * @param humanFeedback 包含 threadId、feedback（approve/reject）和 feedbackContent（具体意见）
 	 */
 	@PostMapping(value = "/resume", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

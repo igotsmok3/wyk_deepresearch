@@ -17,13 +17,15 @@ import java.util.stream.Collectors;
 /**
  * {@link ShortTermMemoryRepository} 的纯内存实现，使用三个并发 Map 分层管理用户提问历史和角色画像。
  *
- * <p>项目职责：维护三个独立的 ConcurrentHashMap：
- * (1) {@code userQueryMemory}（key=conversationId）存每次用户提问原文；
- * (2) {@code shortTermMemoryTrack}（key=userId:conversationId）存 LLM 每次抽取的完整画像历史；
- * (3) {@code shortTermMemory}（key=userId:conversationId）只保留最新一次画像，供快速比对置信度。
- * 默认实现，当 Redis 未启用时由 Spring 注入各依赖方。
+ * <p>
+ * 项目职责：维护三个独立的 ConcurrentHashMap： (1)
+ * {@code userQueryMemory}（key=conversationId）存每次用户提问原文； (2)
+ * {@code shortTermMemoryTrack}（key=userId:conversationId）存 LLM 每次抽取的完整画像历史； (3)
+ * {@code shortTermMemory}（key=userId:conversationId）只保留最新一次画像，供快速比对置信度。 默认实现，当 Redis
+ * 未启用时由 Spring 注入各依赖方。
  *
- * <p>被使用情况：作为 {@code ShortTermMemoryRepository} 的默认 Bean，被 {@code ShortUserRoleMemoryNode}、
+ * <p>
+ * 被使用情况：作为 {@code ShortTermMemoryRepository} 的默认 Bean，被 {@code ShortUserRoleMemoryNode}、
  * {@code RewriteAndMultiQueryNode} 和 {@code ShortUserRoleMemoryController} 通过接口注入使用。
  *
  * @author benym

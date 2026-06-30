@@ -21,11 +21,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * 可观测性功能的配置属性类，绑定 {@code spring.ai.alibaba.deepresearch.observation.*} 前缀的配置项。
  *
- * <p>项目职责：属于配置层，提供可观测性功能的启用开关（{@code enabled}），
- * 控制 {@code ObservationConfiguration} 中工具调用日志监控是否激活。
+ * <p>
+ * 项目职责：属于配置层，提供可观测性功能的启用开关（{@code enabled}）， 控制 {@code ObservationConfiguration}
+ * 中工具调用日志监控是否激活。
  *
- * <p>被使用情况：被 {@code ObservationConfiguration} 通过 {@code @EnableConfigurationProperties} 激活并注入，
- * 用于条件判断是否注册 {@code ObservationHandler} 和 {@code ObservationRegistry} Bean。
+ * <p>
+ * 被使用情况：被 {@code ObservationConfiguration} 通过 {@code @EnableConfigurationProperties}
+ * 激活并注入， 用于条件判断是否注册 {@code ObservationHandler} 和 {@code ObservationRegistry} Bean。
  *
  * @author Allen Hu
  * @since 0.1.0

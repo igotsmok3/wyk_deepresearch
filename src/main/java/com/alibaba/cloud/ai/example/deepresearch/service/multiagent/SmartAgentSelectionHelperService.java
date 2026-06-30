@@ -34,13 +34,14 @@ import java.util.List;
 /**
  * 智能 Agent 选择辅助器，为节点提供统一的 Agent 选择和搜索引擎路由入口。
  *
- * <p>项目职责：整合 {@code SmartAgentDispatcherService}、{@code QuestionClassifierService}
- * 和 {@code SearchPlatformSelectionService}，对外暴露两个高层方法：
- * {@code selectSmartAgent} 用于为研究节点选择最适合的 ChatClient；
- * {@code intelligentSearchSelection} 用于为搜索节点决策传统搜索引擎还是工具调用分支。
+ * <p>
+ * 项目职责：整合 {@code SmartAgentDispatcherService}、{@code QuestionClassifierService} 和
+ * {@code SearchPlatformSelectionService}，对外暴露两个高层方法： {@code selectSmartAgent}
+ * 用于为研究节点选择最适合的 ChatClient； {@code intelligentSearchSelection} 用于为搜索节点决策传统搜索引擎还是工具调用分支。
  * 不是 Spring Bean，由 {@code AgentIntegrationUtil.createSelectionHelper()} 工厂方法创建。
  *
- * <p>被使用情况：被 {@code ResearcherNode} 和 {@code BackgroundInvestigationNode} 通过
+ * <p>
+ * 被使用情况：被 {@code ResearcherNode} 和 {@code BackgroundInvestigationNode} 通过
  * {@code AgentIntegrationUtil} 实例化并持有，负责节点内部的 Agent 与搜索路由决策。
  *
  * @author Makoto
@@ -110,12 +111,8 @@ public class SmartAgentSelectionHelperService {
 	/**
 	 * 统一的智能搜索选择入口。
 	 * <p>
-	 * 决策链：SmartAgent 未开启 → 直接用请求指定的搜索引擎；
-	 * SmartAgent 开启 → AI 分类问题 → 查配置/AI 选平台 →
-	 *   工具调用平台（专用领域源）返回 isToolCalling=true；
-	 *   传统平台返回对应 SearchEnum。
-	 * 任何异常均回退到请求指定引擎，保证主流程不中断。
-	 *
+	 * 决策链：SmartAgent 未开启 → 直接用请求指定的搜索引擎； SmartAgent 开启 → AI 分类问题 → 查配置/AI 选平台 →
+	 * 工具调用平台（专用领域源）返回 isToolCalling=true； 传统平台返回对应 SearchEnum。 任何异常均回退到请求指定引擎，保证主流程不中断。
 	 * @param state 全局状态（含请求指定的 search_engine）
 	 * @param query 搜索查询
 	 * @return 包含搜索引擎、平台、Agent类型和是否工具调用的结果封装

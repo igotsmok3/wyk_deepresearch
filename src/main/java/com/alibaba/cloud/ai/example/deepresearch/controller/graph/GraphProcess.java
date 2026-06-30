@@ -54,11 +54,12 @@ import java.util.concurrent.Future;
 /**
  * 图执行过程管理器，负责将图节点的流式输出转换为 SSE 事件并推送到前端。
  *
- * <p>项目职责：controller 层的辅助类，封装图任务的 {@code threadId} 生成、流式数据处理
- * （区分 LLM 流式输出与普通节点输出并序列化为 JSON）以及任务中止逻辑。内部维护一个固定线程池
- * 和 {@code graphTaskFutureMap} 来支持并发图任务的生命周期管理。
+ * <p>
+ * 项目职责：controller 层的辅助类，封装图任务的 {@code threadId} 生成、流式数据处理 （区分 LLM 流式输出与普通节点输出并序列化为
+ * JSON）以及任务中止逻辑。内部维护一个固定线程池 和 {@code graphTaskFutureMap} 来支持并发图任务的生命周期管理。
  *
- * <p>被使用情况：由 {@link com.alibaba.cloud.ai.example.deepresearch.controller.ChatController}
+ * <p>
+ * 被使用情况：由 {@link com.alibaba.cloud.ai.example.deepresearch.controller.ChatController}
  * 实例化并调用；同时被 {@code GraphProcessExceptionHandlingTest} 测试类直接构造使用。
  */
 public class GraphProcess {

@@ -1,6 +1,10 @@
 server:
   port: 8080
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration
+      - org.springframework.ai.vectorstore.elasticsearch.autoconfigure.ElasticsearchVectorStoreAutoConfiguration
   servlet:
     multipart:
       max-file-size: 10MB
@@ -103,17 +107,48 @@ spring:
           researcher: 4
           coder: 4
         rag:
-          enabled: false
-          # 可以设置为 'simple' 或 'elasticsearch'
-          vector-store-type: simple
-          data:
-            # 启动时加载 classpath下data目录中的所有文件
-            locations:
-              - "classpath:/data/"
-          # Elasticsearch配置
-          #elasticsearch:
-          #  uris: http://localhost:9200
-          #  similarity-function: cosine
+          enabled: true
+          vector-store-type: elasticsearch
+          user-file-ttl-days: 7
+          milvus:
+            host: localhost
+            port: 19530
+            database-name: default
+            collection-name: deepresearch_test
+            embedding-dimension: 1536
+            dual:
+              bm25-top-k: 5
+              vector-top-k: 5
+              retrieval-timeout-ms: 5000
+          # 结构感知切分配置（markdown-splitter 和 pdf-splitter 默认启用，可按需关闭）
+          markdown-splitter:
+            enabled: true
+            split-level: 2
+            keep-code-block-intact: true
+            keep-table-intact: true
+            append-heading-path: true
+          pdf-splitter:
+            enabled: true
+            heading-font-size-ratio: 1.2
+            extract-tables: true
+            table-output-format: markdown
+          mineru:
+            enabled: false
+            api-base-url: https://mineru.net
+            api-token: ${MINERU_API_TOKEN:}
+            model-version: pipeline
+            enable-formula: true
+            enable-table: true
+            language: ch
+            polling-interval-ms: 5000
+            max-polling-attempts: 72
+          elasticsearch:
+            uris: http://localhost:9200
+            index-name: deepresearch-test-index
+            dimensions: 1536
+            similarity-function: cosine
+            hybrid:
+              enabled: true
 
         # 报告导出路径配置
         export:

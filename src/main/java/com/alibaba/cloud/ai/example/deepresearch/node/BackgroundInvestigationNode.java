@@ -49,17 +49,19 @@ import java.util.stream.Collectors;
 /**
  * 背景调查节点：对用户查询的每条优化变体执行网络搜索，并调用 backgroundAgent 生成结构化背景摘要。
  *
- * <p>项目职责：位于 rewrite_multi_query 之后，planner / reporter 之前。从 OverAllState 读取
- * {@code optimize_queries}（由 RewriteAndMultiQueryNode 写入的多条扩展查询），对每条查询独立
- * 搜索并汇总，最终写入：
+ * <p>
+ * 项目职责：位于 rewrite_multi_query 之后，planner / reporter 之前。从 OverAllState 读取
+ * {@code optimize_queries}（由 RewriteAndMultiQueryNode 写入的多条扩展查询），对每条查询独立 搜索并汇总，最终写入：
  * <ul>
- *   <li>{@code site_information}：所有查询的原始搜索结果列表，供 reporter 引用来源</li>
- *   <li>{@code background_investigation_results}：backgroundAgent 为每条查询生成的摘要</li>
- *   <li>{@code background_investigation_next_node}：路由键，深度研究时为 planner，简单问题时为 reporter</li>
+ * <li>{@code site_information}：所有查询的原始搜索结果列表，供 reporter 引用来源</li>
+ * <li>{@code background_investigation_results}：backgroundAgent 为每条查询生成的摘要</li>
+ * <li>{@code background_investigation_next_node}：路由键，深度研究时为 planner，简单问题时为 reporter</li>
  * </ul>
  *
- * <p>被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code background_investigator} 注册到图中；
- * {@code BackgroundInvestigationDispatcher} 读取 {@code background_investigation_next_node} 进行边路由。
+ * <p>
+ * 被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code background_investigator} 注册到图中；
+ * {@code BackgroundInvestigationDispatcher} 读取 {@code background_investigation_next_node}
+ * 进行边路由。
  *
  * @author yingzi
  * @since 2025/5/17 18:37

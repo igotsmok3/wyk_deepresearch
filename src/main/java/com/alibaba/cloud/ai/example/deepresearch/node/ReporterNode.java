@@ -53,21 +53,21 @@ import java.util.Objects;
 /**
  * 报告生成节点：图流程的最后一个工作节点，将所有研究成果综合生成最终报告并持久化。
  *
- * <p>项目职责：按顺序从 OverAllState 读取并拼装消息：用户角色画像（可选）、背景调查摘要
- * （{@code background_investigation_results}）、研究计划标题和思路（深度研究时）、
- * 各并行 researcher/coder 节点的产出（{@code researcher_content_N} / {@code coder_content_N}）、
- * 专业知识库 RAG 结果（{@code use_professional_kb=true} 时）。流式调用 reporterAgent 生成报告，
- * 完成后写入 OverAllState：
+ * <p>
+ * 项目职责：按顺序从 OverAllState 读取并拼装消息：用户角色画像（可选）、背景调查摘要
+ * （{@code background_investigation_results}）、研究计划标题和思路（深度研究时）、 各并行 researcher/coder
+ * 节点的产出（{@code researcher_content_N} / {@code coder_content_N}）、 专业知识库 RAG
+ * 结果（{@code use_professional_kb=true} 时）。流式调用 reporterAgent 生成报告， 完成后写入 OverAllState：
  * <ul>
- *   <li>{@code final_report}：最终报告文本（携带流式 Flux）</li>
- *   <li>{@code thread_id}：当前线程 ID</li>
+ * <li>{@code final_report}：最终报告文本（携带流式 Flux）</li>
+ * <li>{@code thread_id}：当前线程 ID</li>
  * </ul>
  * 同时持久化到 {@code SessionContextService} 和 {@code MessageWindowChatMemory}（短期记忆启用时）。
  *
- * <p>被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code reporter} 注册到图中；
- * {@code BackgroundInvestigationNode} 在简单问题时直接路由到本节点；
- * {@code ProfessionalKbDispatcher} 在不需要知识库时路由到本节点；
- * {@code ReportController} 通过 {@code ReportService} 读取持久化的报告。
+ * <p>
+ * 被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code reporter} 注册到图中；
+ * {@code BackgroundInvestigationNode} 在简单问题时直接路由到本节点； {@code ProfessionalKbDispatcher}
+ * 在不需要知识库时路由到本节点； {@code ReportController} 通过 {@code ReportService} 读取持久化的报告。
  *
  * @author yingzi
  * @since 2025/5/18 15:58

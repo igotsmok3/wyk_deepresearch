@@ -8,11 +8,12 @@ import java.util.List;
 /**
  * 短期用户角色记忆仓储接口，定义用户提问历史和 LLM 抽取的角色画像的存储与查询契约。
  *
- * <p>项目职责：抽象短期记忆的读写操作，包括用户查询历史的保存与分页读取、
- * 角色画像轨迹的追加与最新记录查询，以及按会话清理记忆；
- * 实现类负责具体的存储策略（内存、Redis 等）。
+ * <p>
+ * 项目职责：抽象短期记忆的读写操作，包括用户查询历史的保存与分页读取、 角色画像轨迹的追加与最新记录查询，以及按会话清理记忆； 实现类负责具体的存储策略（内存、Redis
+ * 等）。
  *
- * <p>被使用情况：{@code ShortUserRoleMemoryNode} 通过本接口读写用户查询历史和角色画像；
+ * <p>
+ * 被使用情况：{@code ShortUserRoleMemoryNode} 通过本接口读写用户查询历史和角色画像；
  * {@code RewriteAndMultiQueryNode} 读取历史提问用于 query 改写；
  * {@code ShortUserRoleMemoryController} 提供清理记忆的 HTTP 接口；
  * {@code DeepResearchConfiguration} 在条件注入时引用本接口。

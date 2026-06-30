@@ -21,11 +21,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * 报告相关接口的通用响应体，封装线程 ID、状态文本、消息及泛型报告数据。
  *
- * <p>项目职责：作为 {@code ReportController} 所有接口的标准响应结构，
- * 支持成功、未找到、错误三种状态的静态工厂方法，便于统一前端响应格式。
+ * <p>
+ * 项目职责：作为 {@code ReportController} 所有接口的标准响应结构， 支持成功、未找到、错误三种状态的静态工厂方法，便于统一前端响应格式。
  *
- * <p>被使用情况：{@code ReportController} 在获取报告、检查是否存在、删除报告、导出报告
- * 等接口中构建并返回该对象。
+ * <p>
+ * 被使用情况：{@code ReportController} 在获取报告、检查是否存在、删除报告、导出报告 等接口中构建并返回该对象。
  *
  * @author huangzhen
  * @since 2025/6/20

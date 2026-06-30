@@ -53,15 +53,16 @@ import java.util.stream.Collectors;
 /**
  * 研究员节点：并行研究团队中负责处理 RESEARCH 类型步骤的执行者，执行网络搜索并生成研究内容。
  *
- * <p>项目职责：从 OverAllState 的 {@code current_plan} 中找到分配给自己（{@code researcher_N}）
- * 且待执行的 RESEARCH 步骤，先执行网络搜索，再将搜索结果和任务描述传给 researchAgent 流式生成
- * 研究报告。支持 Reflection 机制和 SmartAgent 智能路由（按问题类型选择专业化 Agent）。
- * 写入 OverAllState 的 {@code researcher_content_{N}} 键（流式 Flux）和
+ * <p>
+ * 项目职责：从 OverAllState 的 {@code current_plan} 中找到分配给自己（{@code researcher_N}） 且待执行的
+ * RESEARCH 步骤，先执行网络搜索，再将搜索结果和任务描述传给 researchAgent 流式生成 研究报告。支持 Reflection 机制和 SmartAgent
+ * 智能路由（按问题类型选择专业化 Agent）。 写入 OverAllState 的 {@code researcher_content_{N}} 键（流式 Flux）和
  * {@code site_information}（追加本轮搜索结果）。
  *
- * <p>被使用情况：由 {@code DeepResearchConfiguration#addResearcherNodes} 根据配置动态注册多个实例
- * （{@code researcher_0}、{@code researcher_1} 等）；{@code ReflectionProcessor} 以同一实例注入
- * 所有 ResearcherNode；{@code ReflectionUtil} 提供共用的 Reflection 状态判断工具方法。
+ * <p>
+ * 被使用情况：由 {@code DeepResearchConfiguration#addResearcherNodes} 根据配置动态注册多个实例
+ * （{@code researcher_0}、{@code researcher_1} 等）；{@code ReflectionProcessor} 以同一实例注入 所有
+ * ResearcherNode；{@code ReflectionUtil} 提供共用的 Reflection 状态判断工具方法。
  *
  * @author sixiyida
  * @since 2025/6/14 11:17

@@ -19,12 +19,13 @@ package com.alibaba.cloud.ai.example.deepresearch.model.dto;
 /**
  * 反思评估结果数据传输对象，记录 LLM 对某一步骤执行结果的质量判断及改进建议。
  *
- * <p>项目职责：由 {@code ReflectionProcessor} 将 LLM 输出的 JSON 反序列化为此类，
- * 并追加到 {@code Plan.Step#reflectionHistory} 列表，驱动节点在质量不达标时重试执行。
+ * <p>
+ * 项目职责：由 {@code ReflectionProcessor} 将 LLM 输出的 JSON 反序列化为此类， 并追加到
+ * {@code Plan.Step#reflectionHistory} 列表，驱动节点在质量不达标时重试执行。
  *
- * <p>被使用情况：{@code ReflectionProcessor} 创建实例并写入执行结果快照；
- * {@code ReflectionUtil} 读取历史列表构建反思 Prompt；
- * {@code Plan.Step} 持有反思历史列表。
+ * <p>
+ * 被使用情况：{@code ReflectionProcessor} 创建实例并写入执行结果快照； {@code ReflectionUtil} 读取历史列表构建反思
+ * Prompt； {@code Plan.Step} 持有反思历史列表。
  *
  * @author sixiyida
  * @since 2025/7/10
@@ -37,14 +38,12 @@ public class ReflectionResult {
 	private boolean passed;
 
 	/**
-	 * 评估反馈文本，包含具体的不足之处和改进建议，
-	 * 会在下一次执行时注入 prompt 让节点参考改进。
+	 * 评估反馈文本，包含具体的不足之处和改进建议， 会在下一次执行时注入 prompt 让节点参考改进。
 	 */
 	private String feedback;
 
 	/**
-	 * 本次被评估的执行结果快照，便于在历史记录中回溯对比。
-	 * 由 ReflectionProcessor 在评估后写入，并非 LLM 输出字段。
+	 * 本次被评估的执行结果快照，便于在历史记录中回溯对比。 由 ReflectionProcessor 在评估后写入，并非 LLM 输出字段。
 	 */
 	private String executionResult;
 

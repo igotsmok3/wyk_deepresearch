@@ -29,13 +29,15 @@ import java.nio.charset.StandardCharsets;
 /**
  * 静态资源加载工具类，将 classpath 中的文件资源转换为字符串，主要用于读取 Prompt 模板文件。
  *
- * <p>项目职责：封装 Spring {@code Resource} 流读取和 {@code ClassPathResource} 路径加载两种方式，
+ * <p>
+ * 项目职责：封装 Spring {@code Resource} 流读取和 {@code ClassPathResource} 路径加载两种方式，
  * 简化各配置类和服务在初始化时读取 Prompt Markdown 文件的代码。
  *
- * <p>被使用情况：{@code AgentsConfiguration} 调用 {@code loadResourceAsString} 为各 ChatClient 注入系统提示词；
- * {@code ModelParamRepositoryImpl} 调用同方法加载 model-config.json；
- * {@code InfoCheckService} 加载背景信息检查提示词模板；
- * {@code AgentPromptTemplateUtil} 调用 {@code loadFileContent} 加载多 Agent 专用提示词。
+ * <p>
+ * 被使用情况：{@code AgentsConfiguration} 调用 {@code loadResourceAsString} 为各 ChatClient
+ * 注入系统提示词； {@code ModelParamRepositoryImpl} 调用同方法加载 model-config.json；
+ * {@code InfoCheckService} 加载背景信息检查提示词模板； {@code AgentPromptTemplateUtil} 调用
+ * {@code loadFileContent} 加载多 Agent 专用提示词。
  *
  * @author ViliamSun
  * @since 2025/6/14

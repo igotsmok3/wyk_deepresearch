@@ -27,13 +27,15 @@ import org.springframework.core.ParameterizedTypeReference;
 /**
  * Reflection 核心处理器，负责在节点执行完成后对结果进行质量评估，并根据评估结论决定是通过还是驱动节点重新执行。
  *
- * <p>项目职责：封装"执行完成 → 质量评估 → 通过/重试"的完整反思循环，调用 reflectionAgent（LLM）
- * 对 Step 执行结果评分，超过最大重试次数时强制通过，防止死循环；
- * 由 {@code DeepResearchConfiguration#reflectionProcessor()} 创建，以同一实例注入所有并行节点。
+ * <p>
+ * 项目职责：封装"执行完成 → 质量评估 → 通过/重试"的完整反思循环，调用 reflectionAgent（LLM） 对 Step
+ * 执行结果评分，超过最大重试次数时强制通过，防止死循环； 由 {@code DeepResearchConfiguration#reflectionProcessor()}
+ * 创建，以同一实例注入所有并行节点。
  *
- * <p>被使用情况：{@code DeepResearchConfiguration} 在 Reflection 功能启用时创建本类 Bean 并注入；
- * {@code ResearcherNode} 和 {@code CoderNode} 在 {@code apply()} 入口处调用 {@code handleReflection}
- * 决定是否继续执行业务逻辑；{@code ReflectionUtil} 提供配套的静态判断方法。
+ * <p>
+ * 被使用情况：{@code DeepResearchConfiguration} 在 Reflection 功能启用时创建本类 Bean 并注入；
+ * {@code ResearcherNode} 和 {@code CoderNode} 在 {@code apply()} 入口处调用
+ * {@code handleReflection} 决定是否继续执行业务逻辑；{@code ReflectionUtil} 提供配套的静态判断方法。
  *
  * @author sixiyida
  * @since 2025/7/10
@@ -62,12 +64,11 @@ public class ReflectionProcessor {
 	 * Reflection 入口，在节点 apply() 开头调用，根据 Step 当前状态决定下一步动作。
 	 *
 	 * <ul>
-	 *   <li>{@code waiting_reflecting_*}：执行评估，通过则 completed，否则转 waiting_processing</li>
-	 *   <li>{@code waiting_processing_*}：清空旧结果，返回 continueProcessing 让节点重新执行</li>
-	 *   <li>其他状态（assigned / processing）：直接 continueProcessing，走正常首次执行路径</li>
+	 * <li>{@code waiting_reflecting_*}：执行评估，通过则 completed，否则转 waiting_processing</li>
+	 * <li>{@code waiting_processing_*}：清空旧结果，返回 continueProcessing 让节点重新执行</li>
+	 * <li>其他状态（assigned / processing）：直接 continueProcessing，走正常首次执行路径</li>
 	 * </ul>
-	 *
-	 * @param step     当前被处理的计划步骤
+	 * @param step 当前被处理的计划步骤
 	 * @param nodeName 节点名称，如 {@code researcher_0}
 	 * @param nodeType 节点类型，{@code "researcher"} 或 {@code "coder"}
 	 * @return 指示节点是否应继续执行业务逻辑的结果对象
@@ -92,8 +93,7 @@ public class ReflectionProcessor {
 	}
 
 	/**
-	 * 执行质量评估，调用 reflectionAgent 判断结果好坏。
-	 * 超出最大重试次数时强制通过，防止死循环。
+	 * 执行质量评估，调用 reflectionAgent 判断结果好坏。 超出最大重试次数时强制通过，防止死循环。
 	 */
 	private ReflectionHandleResult performReflection(Plan.Step step, String nodeName, String nodeType) {
 		try {
@@ -133,8 +133,7 @@ public class ReflectionProcessor {
 	}
 
 	/**
-	 * 调用 reflectionAgent 对 Step 执行结果进行质量评估，
-	 * 并将评估结果追加到 Step 的 reflectionHistory。
+	 * 调用 reflectionAgent 对 Step 执行结果进行质量评估， 并将评估结果追加到 Step 的 reflectionHistory。
 	 */
 	private boolean evaluateStepQuality(Plan.Step step, String nodeType) {
 		String evaluationPrompt = buildEvaluationPrompt(step, nodeType);
@@ -189,8 +188,7 @@ public class ReflectionProcessor {
 	}
 
 	/**
-	 * 从 reflectionHistory 列表长度读取已反思次数。
-	 * 兼容旧版本通过 executionStatus 字符串存储次数的方式。
+	 * 从 reflectionHistory 列表长度读取已反思次数。 兼容旧版本通过 executionStatus 字符串存储次数的方式。
 	 */
 	private int getReflectionAttemptCount(Plan.Step step) {
 		if (step.getReflectionHistory() != null) {
@@ -223,8 +221,7 @@ public class ReflectionProcessor {
 	}
 
 	/**
-	 * handleReflection 的返回值，告知调用方是否应继续执行节点业务逻辑。
-	 * continueProcessing=true  → 节点继续正常执行
+	 * handleReflection 的返回值，告知调用方是否应继续执行节点业务逻辑。 continueProcessing=true → 节点继续正常执行
 	 * continueProcessing=false → 节点跳过本次执行（反思已处理完毕）
 	 */
 	public static class ReflectionHandleResult {

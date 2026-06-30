@@ -24,12 +24,14 @@ import java.util.List;
 /**
  * MCP 代理节点分配配置属性类，绑定 {@code spring.ai.alibaba.deepresearch.mcp.*} 前缀的配置项。
  *
- * <p>项目职责：属于配置层，提供 MCP 功能的开关（{@code enabled}）和配置文件路径（{@code configLocation}），
- * 并通过内部 record 类型 {@code McpServerConfig} 和 {@code McpServerInfo} 定义 mcp-config.json 的反序列化结构。
+ * <p>
+ * 项目职责：属于配置层，提供 MCP 功能的开关（{@code enabled}）和配置文件路径（{@code configLocation}）， 并通过内部 record
+ * 类型 {@code McpServerConfig} 和 {@code McpServerInfo} 定义 mcp-config.json 的反序列化结构。
  *
- * <p>被使用情况：被 {@code McpAssignNodeConfiguration} 读取以加载 MCP 配置文件；
- * {@code McpClientUtil} 和 {@code McpConfigMergeUtil} 使用其内部类型操作 MCP Server 配置；
- * {@code DeepResearchConfiguration} 通过 {@code @EnableConfigurationProperties} 激活本类。
+ * <p>
+ * 被使用情况：被 {@code McpAssignNodeConfiguration} 读取以加载 MCP 配置文件； {@code McpClientUtil} 和
+ * {@code McpConfigMergeUtil} 使用其内部类型操作 MCP Server 配置； {@code DeepResearchConfiguration}
+ * 通过 {@code @EnableConfigurationProperties} 激活本类。
  *
  * @author Makoto
  */
@@ -67,8 +69,7 @@ public class McpAssignNodeProperties {
 	}
 
 	/**
-	 * 单个 MCP Server 的连接信息。
-	 * url: Server 基础地址；sseEndpoint: SSE 路径（默认 /sse）；enabled: 是否启用。
+	 * 单个 MCP Server 的连接信息。 url: Server 基础地址；sseEndpoint: SSE 路径（默认 /sse）；enabled: 是否启用。
 	 */
 	public static record McpServerInfo(String url, @JsonProperty("sse-endpoint") String sseEndpoint, String description,
 			boolean enabled) {

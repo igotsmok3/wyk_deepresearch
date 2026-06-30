@@ -25,11 +25,13 @@ import java.util.List;
 /**
  * 研究计划数据传输对象，描述 Planner 节点生成的完整执行计划及其步骤列表。
  *
- * <p>项目职责：作为图状态（OverAllState）中 {@code current_plan} 键对应的核心数据结构，
- * 在 Planner、ParallelExecutor、Researcher、Coder 等节点之间传递任务上下文，
- * 内部 {@code Step} 嵌套类记录每步执行结果和反思历史。
+ * <p>
+ * 项目职责：作为图状态（OverAllState）中 {@code current_plan} 键对应的核心数据结构， 在
+ * Planner、ParallelExecutor、Researcher、Coder 等节点之间传递任务上下文， 内部 {@code Step}
+ * 嵌套类记录每步执行结果和反思历史。
  *
- * <p>被使用情况：{@code DeepResearchDeserializer} 反序列化图状态中的计划；
+ * <p>
+ * 被使用情况：{@code DeepResearchDeserializer} 反序列化图状态中的计划；
  * {@code StateUtil}、{@code ReflectionProcessor}、{@code ReflectionUtil} 读取步骤信息进行反思判断；
  * {@code ParallelExecutorNode} 遍历步骤分配并行任务。
  *
@@ -65,8 +67,7 @@ public class Plan {
 		private String executionStatus;
 
 		/**
-		 * 反思历史，记录每轮反思的评估结果（含 feedback 和 executionResult 快照）。
-		 * 列表长度等于已经触发的反思次数，可作为重试计数器。
+		 * 反思历史，记录每轮反思的评估结果（含 feedback 和 executionResult 快照）。 列表长度等于已经触发的反思次数，可作为重试计数器。
 		 * 非空时会将历史 feedback 注入到下一次执行的 prompt 中。
 		 */
 		private List<ReflectionResult> reflectionHistory;

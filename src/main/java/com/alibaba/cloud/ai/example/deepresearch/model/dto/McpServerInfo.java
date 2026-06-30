@@ -19,10 +19,11 @@ package com.alibaba.cloud.ai.example.deepresearch.model.dto;
 /**
  * MCP 服务信息数据传输对象，描述单个 MCP 服务的名称、地址、描述及启用状态。
  *
- * <p>项目职责：用于向前端暴露已配置的 MCP 服务列表，包含服务识别与展示所需的全部字段。
+ * <p>
+ * 项目职责：用于向前端暴露已配置的 MCP 服务列表，包含服务识别与展示所需的全部字段。
  *
- * <p>被使用情况：{@code McpService} 负责从配置文件解析并构建该对象列表；
- * {@code McpController} 将列表作为接口响应返回给前端。
+ * <p>
+ * 被使用情况：{@code McpService} 负责从配置文件解析并构建该对象列表； {@code McpController} 将列表作为接口响应返回给前端。
  *
  * @author Makoto
  * @since 2025/1/24

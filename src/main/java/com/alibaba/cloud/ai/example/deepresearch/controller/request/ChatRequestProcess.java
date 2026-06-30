@@ -26,13 +26,15 @@ import java.util.Map;
 /**
  * 聊天请求预处理工具类，负责对入参进行默认值填充和图执行状态初始化。
  *
- * <p>项目职责：controller 层的请求处理辅助类，提供三个静态方法：
- * {@code getDefaultChatRequest} 对 {@link com.alibaba.cloud.ai.example.deepresearch.model.req.ChatRequest}
+ * <p>
+ * 项目职责：controller 层的请求处理辅助类，提供三个静态方法： {@code getDefaultChatRequest} 对
+ * {@link com.alibaba.cloud.ai.example.deepresearch.model.req.ChatRequest}
  * 中的空字段填充合理默认值；{@code updateThreadId} 将生成的 {@code threadId} 写回请求；
  * {@code initializeObjectMap} 将请求字段展开为图执行所需的初始状态 Map。
  *
- * <p>被使用情况：由 {@link com.alibaba.cloud.ai.example.deepresearch.controller.ChatController}
- * 在每次 SSE 请求进入时调用，完成请求参数的规范化处理。
+ * <p>
+ * 被使用情况：由 {@link com.alibaba.cloud.ai.example.deepresearch.controller.ChatController} 在每次
+ * SSE 请求进入时调用，完成请求参数的规范化处理。
  */
 public class ChatRequestProcess {
 

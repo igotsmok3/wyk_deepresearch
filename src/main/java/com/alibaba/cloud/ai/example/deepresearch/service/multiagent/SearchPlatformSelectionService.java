@@ -38,15 +38,16 @@ import java.util.List;
 /**
  * 搜索平台选择服务，根据 Agent 类型和问题内容智能决策最适合的搜索平台。
  *
- * <p>项目职责：封装搜索平台的选择逻辑——优先读取 {@code SmartAgentProperties} 中的静态配置
- * {@code search-platform-mapping}，无配置时再调用 AI 动态决策；将结果转换为
- * {@code SearchEnum} 列表或 {@code SearchPlatform}（用于工具调用分支）返回给调用方。
- * 主平台不可用时按 Tavily → Aliyun → Baidu → SerpAPI 顺序降级。
- * 仅在 smart-agents 功能开启时注册为 Bean。
+ * <p>
+ * 项目职责：封装搜索平台的选择逻辑——优先读取 {@code SmartAgentProperties} 中的静态配置
+ * {@code search-platform-mapping}，无配置时再调用 AI 动态决策；将结果转换为 {@code SearchEnum} 列表或
+ * {@code SearchPlatform}（用于工具调用分支）返回给调用方。 主平台不可用时按 Tavily → Aliyun → Baidu → SerpAPI
+ * 顺序降级。 仅在 smart-agents 功能开启时注册为 Bean。
  *
- * <p>被使用情况：被 {@code SmartAgentDispatcherService}、{@code SmartAgentSelectionHelperService}
- * 和 {@code BackgroundInvestigationNode} 注入，协同完成搜索引擎路由；
- * 也通过 {@code AgentIntegrationUtil} 间接引用。
+ * <p>
+ * 被使用情况：被 {@code SmartAgentDispatcherService}、{@code SmartAgentSelectionHelperService} 和
+ * {@code BackgroundInvestigationNode} 注入，协同完成搜索引擎路由； 也通过 {@code AgentIntegrationUtil}
+ * 间接引用。
  *
  * @author Makoto
  * @since 2025/07/17
@@ -73,8 +74,8 @@ public class SearchPlatformSelectionService {
 	}
 
 	/**
-	 * 平台选择核心逻辑：优先读静态配置，无配置时才调用 AI 动态决策。
-	 * 静态配置通过 search-platform-mapping 指定，AI 决策有网络延迟，故配置优先。
+	 * 平台选择核心逻辑：优先读静态配置，无配置时才调用 AI 动态决策。 静态配置通过 search-platform-mapping 指定，AI
+	 * 决策有网络延迟，故配置优先。
 	 */
 	private SearchPlatform selectPlatformInternal(AgentType agentType, String question) {
 		SearchPlatform primaryPlatform = getPrimaryPlatformFromConfig(agentType);
@@ -87,8 +88,7 @@ public class SearchPlatformSelectionService {
 	}
 
 	/**
-	 * 根据 Agent 类型选择对应的 SearchEnum 列表，供传统搜索引擎使用。
-	 * 若选中的是工具调用平台（如 OpenAlex），返回 TAVILY 作为占位符；
+	 * 根据 Agent 类型选择对应的 SearchEnum 列表，供传统搜索引擎使用。 若选中的是工具调用平台（如 OpenAlex），返回 TAVILY 作为占位符；
 	 * 调用方应根据 isToolCallingPlatform() 判断是否真正走工具调用分支。
 	 */
 	public List<SearchEnum> selectSearchPlatforms(AgentType agentType, String question) {

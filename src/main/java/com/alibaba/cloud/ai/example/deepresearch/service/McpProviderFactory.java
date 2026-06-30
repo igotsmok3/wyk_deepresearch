@@ -35,14 +35,14 @@ import java.util.function.Function;
 /**
  * MCP 工具提供者工厂，封装 {@code AsyncMcpToolCallbackProvider} 的创建过程。
  *
- * <p>项目职责：将创建 MCP 工具回调提供者所需的基础设施依赖（MCP 客户端配置器、
- * 公共属性、WebClient 等）聚合在一起；节点只需调用 {@code createProvider(state, agentName)}
- * 即可获得对应 agent 的 MCP 工具集，屏蔽客户端初始化及 SSE 握手细节。
- * 仅在 {@code spring.ai.alibaba.deepresearch.mcp.enabled=true} 时注册为 Bean。
+ * <p>
+ * 项目职责：将创建 MCP 工具回调提供者所需的基础设施依赖（MCP 客户端配置器、 公共属性、WebClient 等）聚合在一起；节点只需调用
+ * {@code createProvider(state, agentName)} 即可获得对应 agent 的 MCP 工具集，屏蔽客户端初始化及 SSE 握手细节。 仅在
+ * {@code spring.ai.alibaba.deepresearch.mcp.enabled=true} 时注册为 Bean。
  *
- * <p>被使用情况：被 {@code CoderNode} 和 {@code ResearcherNode} 注入，用于在
- * 节点执行时动态获取对应 agent 的 MCP 工具；也通过 {@code DeepResearchConfiguration}
- * 装配到节点中。
+ * <p>
+ * 被使用情况：被 {@code CoderNode} 和 {@code ResearcherNode} 注入，用于在 节点执行时动态获取对应 agent 的 MCP
+ * 工具；也通过 {@code DeepResearchConfiguration} 装配到节点中。
  *
  * @author Makoto
  */
@@ -73,9 +73,8 @@ public class McpProviderFactory {
 	}
 
 	/**
-	 * 为指定 agent 创建 MCP 工具提供者。
-	 * 内部委托给 McpClientUtil，会建立 SSE 连接并完成 initialize 握手。
-	 * 若该 agent 无可用 Server 配置或连接失败，返回 null；调用方应做 null 判断。
+	 * 为指定 agent 创建 MCP 工具提供者。 内部委托给 McpClientUtil，会建立 SSE 连接并完成 initialize 握手。 若该 agent
+	 * 无可用 Server 配置或连接失败，返回 null；调用方应做 null 判断。
 	 */
 	public AsyncMcpToolCallbackProvider createProvider(OverAllState state, String agentName) {
 		return McpClientUtil.createMcpProvider(state, agentName, mcpConfigProvider, mcpAsyncClientConfigurer,

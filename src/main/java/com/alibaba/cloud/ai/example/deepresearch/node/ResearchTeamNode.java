@@ -30,15 +30,17 @@ import java.util.Map;
 /**
  * 研究团队调度节点：检查研究计划中所有步骤是否都已执行完毕，决定是继续分配任务还是进入报告阶段。
  *
- * <p>项目职责：并行 researcher/coder 节点的汇聚点和循环调度入口。从 OverAllState 读取
- * {@code current_plan}，检查所有步骤的 {@code executionStatus} 是否均已为 completed 或 error。
- * 写入 OverAllState：{@code research_team_next_node}，取值为：
+ * <p>
+ * 项目职责：并行 researcher/coder 节点的汇聚点和循环调度入口。从 OverAllState 读取 {@code current_plan}，检查所有步骤的
+ * {@code executionStatus} 是否均已为 completed 或 error。 写入
+ * OverAllState：{@code research_team_next_node}，取值为：
  * <ul>
- *   <li>{@code parallel_executor}：仍有未完成步骤，继续分配执行</li>
- *   <li>{@code professional_kb_decision}：所有步骤完成，进入知识库决策阶段</li>
+ * <li>{@code parallel_executor}：仍有未完成步骤，继续分配执行</li>
+ * <li>{@code professional_kb_decision}：所有步骤完成，进入知识库决策阶段</li>
  * </ul>
  *
- * <p>被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code research_team} 注册到图中；
+ * <p>
+ * 被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code research_team} 注册到图中；
  * {@code ResearchTeamDispatcher} 读取 {@code research_team_next_node} 进行边路由；
  * {@code HumanFeedbackNode} 用户确认计划后路由到本节点。
  *

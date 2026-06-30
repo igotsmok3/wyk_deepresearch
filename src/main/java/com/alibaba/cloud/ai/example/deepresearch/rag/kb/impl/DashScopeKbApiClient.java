@@ -35,11 +35,13 @@ import java.util.Map;
 /**
  * 阿里云 DashScope 专业知识库 API 客户端，通过 Bearer Token 鉴权调用 DashScope 文本检索接口并解析响应。
  *
- * <p>项目职责：ProfessionalKbApiClient 的 DashScope 实现，封装 DashScope 知识库搜索协议
- * （POST JSON，响应路径 output.nodes），将检索结果映射为 KbSearchResult 列表。
+ * <p>
+ * 项目职责：ProfessionalKbApiClient 的 DashScope 实现，封装 DashScope 知识库搜索协议 （POST JSON，响应路径
+ * output.nodes），将检索结果映射为 KbSearchResult 列表。
  *
- * <p>被使用情况：由 ProfessionalKbApiClientFactory 在 provider 为 "dashscope" 时创建，
- * 供 ProfessionalKbApiStrategy 调用以查询 DashScope 专业知识库。
+ * <p>
+ * 被使用情况：由 ProfessionalKbApiClientFactory 在 provider 为 "dashscope" 时创建， 供
+ * ProfessionalKbApiStrategy 调用以查询 DashScope 专业知识库。
  *
  * @author hupei
  */

@@ -44,12 +44,14 @@ import java.util.Optional;
 /**
  * 报告管理控制器，提供研究报告的查询、删除、导出、下载和交互式 HTML 生成能力。
  *
- * <p>项目职责：controller 层的报告管理入口，以 {@code threadId} 为主键索引研究报告，
- * 通过 {@link com.alibaba.cloud.ai.example.deepresearch.service.ReportService} 读写报告内容；
- * 支持 Markdown 和 PDF 两种导出格式（由 ExportService 完成格式转换），并可通过 LLM
- * {@code interactionAgent} 将 Markdown 报告流式渲染为可视化单页交互 HTML。
+ * <p>
+ * 项目职责：controller 层的报告管理入口，以 {@code threadId} 为主键索引研究报告， 通过
+ * {@link com.alibaba.cloud.ai.example.deepresearch.service.ReportService} 读写报告内容； 支持
+ * Markdown 和 PDF 两种导出格式（由 ExportService 完成格式转换），并可通过 LLM {@code interactionAgent} 将
+ * Markdown 报告流式渲染为可视化单页交互 HTML。
  *
- * <p>被使用情况：由 Spring 容器直接管理，无其他 Java 类直接引用。
+ * <p>
+ * 被使用情况：由 Spring 容器直接管理，无其他 Java 类直接引用。
  */
 @RestController
 @RequestMapping("/api/reports")

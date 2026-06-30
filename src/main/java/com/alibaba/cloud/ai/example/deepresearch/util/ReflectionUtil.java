@@ -24,13 +24,13 @@ import java.util.List;
 /**
  * Reflection 静态工具方法集合，封装节点侧判断和辅助逻辑，与 {@link ReflectionProcessor} 配合使用。
  *
- * <p>项目职责：提供四类静态方法：(1) 判断 Step 是否由指定节点处理；
- * (2) 将反思历史序列化为 Markdown 以注入重试 Prompt；
- * (3) 判断 {@code ReflectionHandleResult} 后节点是否继续执行；
- * (4) 根据是否启用 Reflection 返回节点完成后应设置的执行状态字符串。
+ * <p>
+ * 项目职责：提供四类静态方法：(1) 判断 Step 是否由指定节点处理； (2) 将反思历史序列化为 Markdown 以注入重试 Prompt； (3) 判断
+ * {@code ReflectionHandleResult} 后节点是否继续执行； (4) 根据是否启用 Reflection 返回节点完成后应设置的执行状态字符串。
  *
- * <p>被使用情况：{@code ResearcherNode} 和 {@code CoderNode} 在 apply() 中调用本类方法，
- * 判断是否应处理当前 Step、是否追加历史反思内容，以及获取执行完成后的状态值。
+ * <p>
+ * 被使用情况：{@code ResearcherNode} 和 {@code CoderNode} 在 apply() 中调用本类方法， 判断是否应处理当前
+ * Step、是否追加历史反思内容，以及获取执行完成后的状态值。
  *
  * @author sixiyida
  * @since 2025/7/10
@@ -38,15 +38,13 @@ import java.util.List;
 public class ReflectionUtil {
 
 	/**
-	 * 判断 Step 当前是否应由指定节点处理。
-	 * 满足以下任意状态即返回 true：
+	 * 判断 Step 当前是否应由指定节点处理。 满足以下任意状态即返回 true：
 	 * <ul>
-	 *   <li>{@code assigned_<nodeName>}        — 首次分配</li>
-	 *   <li>{@code waiting_processing_<nodeName>} — 反思不通过，等待重新执行</li>
-	 *   <li>{@code waiting_reflecting_<nodeName>} — 执行完成，等待反思评估</li>
+	 * <li>{@code assigned_<nodeName>} — 首次分配</li>
+	 * <li>{@code waiting_processing_<nodeName>} — 反思不通过，等待重新执行</li>
+	 * <li>{@code waiting_reflecting_<nodeName>} — 执行完成，等待反思评估</li>
 	 * </ul>
-	 *
-	 * @param step     计划步骤
+	 * @param step 计划步骤
 	 * @param nodeName 节点名称，如 {@code researcher_0}
 	 * @return 是否应由该节点处理
 	 */
@@ -75,9 +73,7 @@ public class ReflectionUtil {
 	}
 
 	/**
-	 * 将 Step 的反思历史序列化为 Markdown 格式，
-	 * 用于在重新执行时注入到 prompt，让节点了解历史评估意见并改进。
-	 *
+	 * 将 Step 的反思历史序列化为 Markdown 格式， 用于在重新执行时注入到 prompt，让节点了解历史评估意见并改进。
 	 * @param step 计划步骤
 	 * @return 包含所有历史反思记录的 Markdown 字符串，无历史时返回空串
 	 */
@@ -122,12 +118,11 @@ public class ReflectionUtil {
 	/**
 	 * 根据 Reflection 是否启用，返回节点执行完成后应设置的状态：
 	 * <ul>
-	 *   <li>启用：设为 {@code waiting_reflecting_*}，等待评估</li>
-	 *   <li>未启用：直接设为 {@code completed_*}</li>
+	 * <li>启用：设为 {@code waiting_reflecting_*}，等待评估</li>
+	 * <li>未启用：直接设为 {@code completed_*}</li>
 	 * </ul>
-	 *
 	 * @param hasReflectionProcessor 是否注入了 ReflectionProcessor（null 表示未启用）
-	 * @param nodeName               节点名称
+	 * @param nodeName 节点名称
 	 * @return 应设置的 executionStatus 字符串
 	 */
 	public static String getCompletionStatus(boolean hasReflectionProcessor, String nodeName) {

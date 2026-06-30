@@ -19,10 +19,11 @@ package com.alibaba.cloud.ai.example.deepresearch.model.enums;
 /**
  * 流式节点前缀枚举，标识各类 LLM 流式输出节点的前缀字符串及其前端可见性。
  *
- * <p>项目职责：各节点在向 SSE 通道写入流式内容时，以枚举前缀拼接节点 ID 作为事件名，
- * {@code visible} 字段控制前端是否展示该节点的流式内容。
+ * <p>
+ * 项目职责：各节点在向 SSE 通道写入流式内容时，以枚举前缀拼接节点 ID 作为事件名， {@code visible} 字段控制前端是否展示该节点的流式内容。
  *
- * <p>被使用情况：{@code GraphProcess} 通过 {@code match} 方法识别当前节点类型决定处理逻辑；
+ * <p>
+ * 被使用情况：{@code GraphProcess} 通过 {@code match} 方法识别当前节点类型决定处理逻辑；
  * {@code PlannerNode}、{@code ResearcherNode}、{@code CoderNode}、{@code ReporterNode}
  * 各自取对应的前缀拼接流式输出事件名。
  */

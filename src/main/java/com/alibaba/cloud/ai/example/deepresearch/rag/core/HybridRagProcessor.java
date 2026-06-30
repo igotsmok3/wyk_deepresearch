@@ -25,10 +25,12 @@ import java.util.Map;
 /**
  * 统一的 RAG 处理器接口，定义查询前处理、混合检索、文档后处理及过滤表达式构建的完整契约。
  *
- * <p>项目职责：RAG 核心抽象层，将检索流程标准化为四个阶段（preProcess / hybridRetrieve /
- * postProcess / buildFilterExpression），供各检索策略统一调用。
+ * <p>
+ * 项目职责：RAG 核心抽象层，将检索流程标准化为四个阶段（preProcess / hybridRetrieve / postProcess /
+ * buildFilterExpression），供各检索策略统一调用。
  *
- * <p>被使用情况：由 DefaultHybridRagProcessor 实现；ProfessionalKbEsStrategy、
+ * <p>
+ * 被使用情况：由 DefaultHybridRagProcessor 实现；ProfessionalKbEsStrategy、
  * ProfessionalKbApiStrategy、UserFileRetrievalStrategy、RagNode 及 RagNodeService 均注入本接口。
  *
  * @author hupei

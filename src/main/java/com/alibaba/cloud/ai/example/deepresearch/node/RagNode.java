@@ -44,13 +44,14 @@ import java.util.Objects;
 /**
  * RAG 图节点：通过 RAG 管道检索相关文档，再将文档内容作为上下文喂给 LLM 流式生成答案。
  *
- * <p>项目职责：支持两种工作模式（向后兼容）。推荐模式使用 {@code HybridRagProcessor}
- * 走完整的查询处理→混合检索→后处理管道；兼容模式使用多个 {@code RetrievalStrategy} 各自检索、
- * {@code FusionStrategy} 融合结果。从 OverAllState 读取 {@code query}、{@code session_id}、
- * {@code user_id}，检索完成后将文档内容拼接为上下文，流式调用 ragAgent 生成答案。
+ * <p>
+ * 项目职责：支持两种工作模式（向后兼容）。推荐模式使用 {@code HybridRagProcessor} 走完整的查询处理→混合检索→后处理管道；兼容模式使用多个
+ * {@code RetrievalStrategy} 各自检索、 {@code FusionStrategy} 融合结果。从 OverAllState 读取
+ * {@code query}、{@code session_id}、 {@code user_id}，检索完成后将文档内容拼接为上下文，流式调用 ragAgent 生成答案。
  * 写入 OverAllState：{@code rag_content}（携带流式 Flux 的 GraphResponse）。
  *
- * <p>被使用情况：由 {@code RagNodeService} 创建两个实例并通过 {@code DeepResearchConfiguration} 注册：
+ * <p>
+ * 被使用情况：由 {@code RagNodeService} 创建两个实例并通过 {@code DeepResearchConfiguration} 注册：
  * {@code user_file_rag}（检索用户上传文件）和 {@code professional_kb_rag}（检索专业知识库）。
  * {@code RewriteAndMultiQueryNode} 在用户上传文件时路由到 user_file_rag；
  * {@code ProfessionalKbDispatcher} 在决策结果为 true 时路由到 professional_kb_rag。

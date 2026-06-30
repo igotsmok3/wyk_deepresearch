@@ -26,11 +26,13 @@ import java.util.Optional;
 /**
  * 图全局状态访问工具类，封装 {@code OverAllState} 中常用字段的读取方法和 Step 执行状态常量。
  *
- * <p>项目职责：集中定义 Step 执行状态前缀常量（assigned/processing/completed/waiting_reflecting 等），
- * 并提供 query、plan、thread_id、session_id、plan_iterations 等常用状态字段的类型安全读取方法，
- * 以及统一的 Step 错误处理逻辑，减少各节点对状态键字符串的硬编码依赖。
+ * <p>
+ * 项目职责：集中定义 Step 执行状态前缀常量（assigned/processing/completed/waiting_reflecting 等）， 并提供
+ * query、plan、thread_id、session_id、plan_iterations 等常用状态字段的类型安全读取方法， 以及统一的 Step
+ * 错误处理逻辑，减少各节点对状态键字符串的硬编码依赖。
  *
- * <p>被使用情况：几乎所有图节点（CoordinatorNode、PlannerNode、ResearcherNode、CoderNode、
+ * <p>
+ * 被使用情况：几乎所有图节点（CoordinatorNode、PlannerNode、ResearcherNode、CoderNode、
  * ReporterNode、ParallelExecutorNode、BackgroundInvestigationNode 等）均通过本类读取状态字段；
  * {@code ReflectionUtil} 引用本类的状态前缀常量判断 Step 执行状态。
  *

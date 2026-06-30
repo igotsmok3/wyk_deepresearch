@@ -6,11 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * 短期用户角色提取结果，聚合 LLM 从对话历史中提取的用户画像信息。
  *
- * <p>项目职责：作为短期记忆节点的核心数据结构，存储用户 ID、会话 ID、角色识别、
- * 对话分析、沟通偏好和用户概述等信息，持久化到记忆存储并在后续节点复用。
+ * <p>
+ * 项目职责：作为短期记忆节点的核心数据结构，存储用户 ID、会话 ID、角色识别、 对话分析、沟通偏好和用户概述等信息，持久化到记忆存储并在后续节点复用。
  *
- * <p>被使用情况：{@code ShortUserRoleMemoryNode} 负责提取、合并并持久化该对象；
- * {@code TemplateUtil} 用于构建包含历史记忆的 Prompt 消息。
+ * <p>
+ * 被使用情况：{@code ShortUserRoleMemoryNode} 负责提取、合并并持久化该对象； {@code TemplateUtil} 用于构建包含历史记忆的
+ * Prompt 消息。
  *
  * @author benym
  */

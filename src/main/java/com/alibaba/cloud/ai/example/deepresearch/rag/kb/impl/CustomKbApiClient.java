@@ -36,11 +36,13 @@ import java.util.Map;
 /**
  * 通用自定义知识库 API 客户端，通过标准 REST GET 请求查询用户自定义的知识库接口并解析多种响应格式。
  *
- * <p>项目职责：ProfessionalKbApiClient 的自定义实现，支持任意符合约定格式的 REST 接口，
- * 兼容 results/data/items/documents/docs 等常见响应结构，并将结果统一转换为 KbSearchResult。
+ * <p>
+ * 项目职责：ProfessionalKbApiClient 的自定义实现，支持任意符合约定格式的 REST 接口， 兼容
+ * results/data/items/documents/docs 等常见响应结构，并将结果统一转换为 KbSearchResult。
  *
- * <p>被使用情况：由 ProfessionalKbApiClientFactory 在 provider 为 "custom" 或未配置时创建，
- * 供 ProfessionalKbApiStrategy 调用以查询专业知识库。
+ * <p>
+ * 被使用情况：由 ProfessionalKbApiClientFactory 在 provider 为 "custom" 或未配置时创建， 供
+ * ProfessionalKbApiStrategy 调用以查询专业知识库。
  *
  * @author hupei
  */

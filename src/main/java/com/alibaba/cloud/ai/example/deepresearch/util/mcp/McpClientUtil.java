@@ -38,12 +38,13 @@ import java.util.function.Function;
 /**
  * MCP 客户端创建工具类，封装为每个启用的 MCP Server 建立 SSE 长连接并完成 initialize 握手的流程。
  *
- * <p>项目职责：核心职责是根据合并后的 MCP 配置为各 Agent 创建 {@code AsyncMcpToolCallbackProvider}，
- * Provider 内含全部可调用的 Tool 列表，可直接注入 ChatClient 的 toolCallbacks；
- * 单个 Server 连接失败只记录错误日志，不影响其他 Server。
+ * <p>
+ * 项目职责：核心职责是根据合并后的 MCP 配置为各 Agent 创建 {@code AsyncMcpToolCallbackProvider}， Provider
+ * 内含全部可调用的 Tool 列表，可直接注入 ChatClient 的 toolCallbacks； 单个 Server 连接失败只记录错误日志，不影响其他 Server。
  *
- * <p>被使用情况：{@code McpProviderFactory} 委托本类的 {@code createMcpProvider} 方法，
- * 在各 MCP-aware 节点（如 ResearcherNode）执行前动态建立 MCP 连接。
+ * <p>
+ * 被使用情况：{@code McpProviderFactory} 委托本类的 {@code createMcpProvider} 方法， 在各 MCP-aware 节点（如
+ * ResearcherNode）执行前动态建立 MCP 连接。
  *
  * @author Makoto
  */
@@ -52,13 +53,10 @@ public class McpClientUtil {
 	private static final Logger logger = LoggerFactory.getLogger(McpClientUtil.class);
 
 	/**
-	 * 为指定 agentName 创建 MCP 提供者。
-	 * 流程：
-	 *   1. 通过 mcpConfigProvider.apply(state) 获取合并后的配置（静态 + 运行时）
-	 *   2. 遍历该 agent 的 enabled Server，用 WebFluxSseClientTransport 建立 SSE 连接
-	 *   3. 对每个 Server 调用 client.initialize().block() 完成 MCP 握手（超时 2 分钟）
-	 *   4. 将所有客户端汇总到 AsyncMcpToolCallbackProvider 返回
-	 * 任何 Server 连接失败只记录 error 日志，不影响其他 Server。
+	 * 为指定 agentName 创建 MCP 提供者。 流程： 1. 通过 mcpConfigProvider.apply(state) 获取合并后的配置（静态 +
+	 * 运行时） 2. 遍历该 agent 的 enabled Server，用 WebFluxSseClientTransport 建立 SSE 连接 3. 对每个
+	 * Server 调用 client.initialize().block() 完成 MCP 握手（超时 2 分钟） 4. 将所有客户端汇总到
+	 * AsyncMcpToolCallbackProvider 返回 任何 Server 连接失败只记录 error 日志，不影响其他 Server。
 	 */
 	public static AsyncMcpToolCallbackProvider createMcpProvider(OverAllState state, String agentName,
 			Function<OverAllState, Map<String, McpAssignNodeProperties.McpServerConfig>> mcpConfigProvider,
@@ -128,8 +126,7 @@ public class McpClientUtil {
 	}
 
 	/**
-	 * 检查创建 MCP Provider 所需的所有依赖是否都已注入（非 null）。
-	 * 节点在尝试 createMcpProvider 之前可先调用此方法快速判断。
+	 * 检查创建 MCP Provider 所需的所有依赖是否都已注入（非 null）。 节点在尝试 createMcpProvider 之前可先调用此方法快速判断。
 	 */
 	public static boolean isMcpConfigurationAvailable(
 			Function<OverAllState, Map<String, McpAssignNodeProperties.McpServerConfig>> mcpConfigProvider,

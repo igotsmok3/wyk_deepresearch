@@ -21,10 +21,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * 报告导出请求体，指定导出格式和目标线程 ID。
  *
- * <p>项目职责：作为 {@code POST /report/export} 接口的请求体，
- * 告知后端以何种格式（Markdown、PDF 等）导出指定线程的研究报告。
+ * <p>
+ * 项目职责：作为 {@code POST /report/export} 接口的请求体， 告知后端以何种格式（Markdown、PDF 等）导出指定线程的研究报告。
  *
- * <p>被使用情况：{@code ReportController#exportReport} 接收该请求并调用导出服务。
+ * <p>
+ * 被使用情况：{@code ReportController#exportReport} 接收该请求并调用导出服务。
  *
  * @author sixiyida
  * @since 2025/6/20

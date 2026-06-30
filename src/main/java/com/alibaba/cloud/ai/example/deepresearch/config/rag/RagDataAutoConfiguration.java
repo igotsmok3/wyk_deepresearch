@@ -39,12 +39,14 @@ import java.util.List;
 /**
  * RAG 数据自动摄入配置类，负责应用启动时的初始数据加载和定时目录扫描摄入。
  *
- * <p>项目职责：属于配置层，仅在 {@code spring.ai.alibaba.deepresearch.rag.enabled=true} 时生效。
- * 实现 {@code ApplicationRunner} 接口，在启动时将 {@code rag.data.locations} 配置的资源路径批量摄入向量库；
+ * <p>
+ * 项目职责：属于配置层，仅在 {@code spring.ai.alibaba.deepresearch.rag.enabled=true} 时生效。 实现
+ * {@code ApplicationRunner} 接口，在启动时将 {@code rag.data.locations} 配置的资源路径批量摄入向量库；
  * 同时提供定时任务，按 cron 表达式扫描指定目录中的新文档，摄入后移至归档目录。
  *
- * <p>被使用情况：由 Spring 容器直接管理（作为 ApplicationRunner 自动执行）；
- * 内部依赖 {@code VectorStoreDataIngestionService} 完成实际的向量化和存储操作。
+ * <p>
+ * 被使用情况：由 Spring 容器直接管理（作为 ApplicationRunner 自动执行）； 内部依赖
+ * {@code VectorStoreDataIngestionService} 完成实际的向量化和存储操作。
  *
  * @author hupei
  */

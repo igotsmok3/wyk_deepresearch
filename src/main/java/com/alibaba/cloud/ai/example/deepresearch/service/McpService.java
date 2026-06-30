@@ -33,11 +33,12 @@ import java.util.Map;
 /**
  * MCP 服务管理类，提供读取和汇总 MCP 服务器配置信息的能力。
  *
- * <p>项目职责：从 classpath 下的 {@code mcp-config.json} 解析各 agent 关联的 MCP 服务器列表，
- * 并封装为 {@code McpServerInfo} 对象；同时提供生成服务摘要（总数、启用/禁用数量、
- * 可用服务名称列表）的工具方法，供前端展示 MCP 配置概览。
+ * <p>
+ * 项目职责：从 classpath 下的 {@code mcp-config.json} 解析各 agent 关联的 MCP 服务器列表， 并封装为
+ * {@code McpServerInfo} 对象；同时提供生成服务摘要（总数、启用/禁用数量、 可用服务名称列表）的工具方法，供前端展示 MCP 配置概览。
  *
- * <p>被使用情况：被 {@code McpController} 注入，通过 HTTP 接口向前端暴露 MCP 服务列表及摘要信息。
+ * <p>
+ * 被使用情况：被 {@code McpController} 注入，通过 HTTP 接口向前端暴露 MCP 服务列表及摘要信息。
  *
  * @author Makoto
  * @since 2025/1/24

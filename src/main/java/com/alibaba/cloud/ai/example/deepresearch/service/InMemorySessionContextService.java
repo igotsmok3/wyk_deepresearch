@@ -28,15 +28,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * {@link SessionContextService} 的纯内存实现，维护会话与线程的映射关系及历史元信息。
  *
- * <p>项目职责：在不依赖 Redis 的场景下，通过 {@code ConcurrentHashMap} 维护
- * sessionId → threadId 列表 和 threadId → SessionHistory（不含报告正文）两张内存表。
- * 报告正文单独委托给 {@code ReportService} 存储，避免大对象在内存中堆积；
+ * <p>
+ * 项目职责：在不依赖 Redis 的场景下，通过 {@code ConcurrentHashMap} 维护 sessionId → threadId 列表 和 threadId
+ * → SessionHistory（不含报告正文）两张内存表。 报告正文单独委托给 {@code ReportService} 存储，避免大对象在内存中堆积；
  * 读取时按需回填，保持惰性加载语义。
  *
- * <p>被使用情况：实现 {@link SessionContextService} 接口，由 Spring 在
- * {@code spring.data.redis.enabled=false}（默认）时自动装配；
- * 被 {@code ReporterNode} 在生成报告后写入历史，被 {@code CoordinatorNode} 和
- * {@code BackgroundInvestigationNode} 读取历史上下文。
+ * <p>
+ * 被使用情况：实现 {@link SessionContextService} 接口，由 Spring 在
+ * {@code spring.data.redis.enabled=false}（默认）时自动装配； 被 {@code ReporterNode} 在生成报告后写入历史，被
+ * {@code CoordinatorNode} 和 {@code BackgroundInvestigationNode} 读取历史上下文。
  *
  * @author vlsmb
  * @since 2025/8/6

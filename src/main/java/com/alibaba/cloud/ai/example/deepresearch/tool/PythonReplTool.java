@@ -58,12 +58,13 @@ import static com.github.dockerjava.api.model.HostConfig.newHostConfig;
 /**
  * Python 代码执行工具，在隔离的 Docker 容器中运行 LLM 生成的 Python 代码并返回执行结果。
  *
- * <p>项目职责：作为 Spring AI Tool 供 Coder Agent 调用，负责将 Python 代码和可选的
- * requirements.txt 写入临时目录，创建 Docker 容器执行，并捕获 stdout/stderr 返回给 LLM；
- * 支持网络隔离模式和资源限制（CPU、内存），执行完毕后自动清理容器和临时文件。
+ * <p>
+ * 项目职责：作为 Spring AI Tool 供 Coder Agent 调用，负责将 Python 代码和可选的 requirements.txt 写入临时目录，创建
+ * Docker 容器执行，并捕获 stdout/stderr 返回给 LLM； 支持网络隔离模式和资源限制（CPU、内存），执行完毕后自动清理容器和临时文件。
  *
- * <p>被使用情况：{@code AgentsConfiguration} 将本类实例直接注入 Coder ChatClient 的 defaultTools，
- * 由 Spring AI 工具调用框架在 Coder Agent 执行代码任务时触发调用。
+ * <p>
+ * 被使用情况：{@code AgentsConfiguration} 将本类实例直接注入 Coder ChatClient 的 defaultTools， 由 Spring
+ * AI 工具调用框架在 Coder Agent 执行代码任务时触发调用。
  *
  * @author vlsmb
  */

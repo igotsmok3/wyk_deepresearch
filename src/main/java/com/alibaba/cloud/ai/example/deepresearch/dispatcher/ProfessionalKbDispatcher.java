@@ -21,12 +21,15 @@ import com.alibaba.cloud.ai.graph.action.EdgeAction;
 /**
  * {@code professional_kb_decision} 节点的条件边路由器，根据专业知识库启用标志决定下一跳节点。
  *
- * <p>项目职责：dispatcher 层的边路由实现，与其他 Dispatcher 不同，本类不依赖节点写入的路由键，
- * 而是直接读取业务标志 {@code use_professional_kb} 在路由层内联完成二选一决策：
- * {@code true} 路由至 {@code "professional_kb_rag"}，{@code false} 路由至 {@code "reporter"}。
+ * <p>
+ * 项目职责：dispatcher 层的边路由实现，与其他 Dispatcher 不同，本类不依赖节点写入的路由键， 而是直接读取业务标志
+ * {@code use_professional_kb} 在路由层内联完成二选一决策： {@code true} 路由至
+ * {@code "professional_kb_rag"}，{@code false} 路由至 {@code "reporter"}。
  *
- * <p>被使用情况：由 {@link com.alibaba.cloud.ai.example.deepresearch.config.DeepResearchConfiguration}
- * 通过 {@code addConditionalEdges("professional_kb_decision", ...)} 注册到图配置中。
+ * <p>
+ * 被使用情况：由
+ * {@link com.alibaba.cloud.ai.example.deepresearch.config.DeepResearchConfiguration} 通过
+ * {@code addConditionalEdges("professional_kb_decision", ...)} 注册到图配置中。
  */
 public class ProfessionalKbDispatcher implements EdgeAction {
 

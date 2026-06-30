@@ -40,11 +40,13 @@ import java.util.stream.Collectors;
 /**
  * 基于外部 API 的专业知识库检索策略，通过 ProfessionalKbApiClientFactory 管理多个 API 客户端并并发查询。
  *
- * <p>项目职责：RetrievalStrategy 的 API 类型实现，负责查询前处理（借助 HybridRagProcessor.preProcess）、
+ * <p>
+ * 项目职责：RetrievalStrategy 的 API 类型实现，负责查询前处理（借助 HybridRagProcessor.preProcess）、
  * 多知识库并发检索、KbSearchResult 到 Document 的元数据转换以及检索结果后处理。
  *
- * <p>被使用情况：作为 Spring Bean 注入到 RagNode 的 retrievalStrategies 列表，
- * 供多策略检索模式使用；strategy 名称为 "professionalKbApi"。
+ * <p>
+ * 被使用情况：作为 Spring Bean 注入到 RagNode 的 retrievalStrategies 列表， 供多策略检索模式使用；strategy 名称为
+ * "professionalKbApi"。
  *
  * @author hupei
  */

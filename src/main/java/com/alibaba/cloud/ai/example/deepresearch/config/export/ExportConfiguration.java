@@ -24,11 +24,13 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 导出服务配置类，负责创建并注册 {@code ExportService} Bean。
  *
- * <p>项目职责：属于配置层，读取 {@link ExportProperties} 中的导出路径配置，
- * 构造 {@code ExportService} 实例并注入到 Spring 容器，为报告导出功能提供服务支撑。
+ * <p>
+ * 项目职责：属于配置层，读取 {@link ExportProperties} 中的导出路径配置， 构造 {@code ExportService} 实例并注入到 Spring
+ * 容器，为报告导出功能提供服务支撑。
  *
- * <p>被使用情况：由 Spring 容器直接管理；产出的 {@code ExportService} Bean 被
- * {@code ReportController} 注入以处理报告导出请求。
+ * <p>
+ * 被使用情况：由 Spring 容器直接管理；产出的 {@code ExportService} Bean 被 {@code ReportController}
+ * 注入以处理报告导出请求。
  *
  * @author sixiyida
  * @since 2025/6/20

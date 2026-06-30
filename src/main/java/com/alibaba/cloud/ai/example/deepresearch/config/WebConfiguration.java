@@ -26,10 +26,12 @@ import org.springframework.web.filter.CorsFilter;
 /**
  * Web 全局配置类，负责注册跨域过滤器以允许前端应用跨域访问后端接口。
  *
- * <p>项目职责：属于配置层，配置 CORS（跨域资源共享）过滤器，
- * 允许所有来源、所有请求头和所有 HTTP 方法，解决前端 Vue 应用（默认运行在不同端口）与后端 API 之间的跨域问题。
+ * <p>
+ * 项目职责：属于配置层，配置 CORS（跨域资源共享）过滤器， 允许所有来源、所有请求头和所有 HTTP 方法，解决前端 Vue 应用（默认运行在不同端口）与后端 API
+ * 之间的跨域问题。
  *
- * <p>被使用情况：由 Spring 容器直接管理，无其他类直接引用，由 Spring MVC 框架自动应用到所有请求路径。
+ * <p>
+ * 被使用情况：由 Spring 容器直接管理，无其他类直接引用，由 Spring MVC 框架自动应用到所有请求路径。
  */
 @Configuration
 public class WebConfiguration {

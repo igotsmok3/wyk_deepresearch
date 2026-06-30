@@ -36,11 +36,13 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Spring AI {@code Message} 接口的自定义 JSON 反序列化器，支持 USER、ASSISTANT、SYSTEM、TOOL 四种消息类型。
  *
- * <p>项目职责：解决 Jackson 无法直接反序列化 {@code Message} 接口的问题；
- * 通过 {@code MessageFactory} 工厂注册表按 messageType/type/role 字段路由到对应的消息构造逻辑，
- * 并分别提取 content、metadata、toolCalls、toolResponses 等字段。
+ * <p>
+ * 项目职责：解决 Jackson 无法直接反序列化 {@code Message} 接口的问题； 通过 {@code MessageFactory} 工厂注册表按
+ * messageType/type/role 字段路由到对应的消息构造逻辑， 并分别提取 content、metadata、toolCalls、toolResponses
+ * 等字段。
  *
- * <p>被使用情况：由 {@code DeepResearchStateSerializer} 在构造时注册到 Jackson {@code SimpleModule}，
+ * <p>
+ * 被使用情况：由 {@code DeepResearchStateSerializer} 在构造时注册到 Jackson {@code SimpleModule}，
  * 在图状态中包含消息历史的字段（如 {@code messages}）反序列化时自动触发。
  */
 public class MessageDeserializer extends JsonDeserializer<Message> {

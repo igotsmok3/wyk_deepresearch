@@ -36,13 +36,14 @@ import java.util.stream.Collectors;
 /**
  * 搜索信息聚合服务，封装搜索执行、过滤、Jina Crawler 抓取和工具调用分支的完整流程。
  *
- * <p>项目职责：提供两个重载的 {@code searchInfo} 方法——基础版走 {@code SearchFilterService}
- * 过滤管线并可选用 Jina Crawler 替换摘要；扩展版额外支持工具调用平台（OpenAlex/Wikipedia 等），
- * 优先调用 {@code ToolCallingSearchService}，失败或结果为空时回退到传统搜索引擎。
- * 搜索失败最多重试 3 次，间隔 500ms，保证节点健壮性。
- * 非 Spring Bean，由使用节点在构造函数中手动创建。
+ * <p>
+ * 项目职责：提供两个重载的 {@code searchInfo} 方法——基础版走 {@code SearchFilterService} 过滤管线并可选用 Jina
+ * Crawler 替换摘要；扩展版额外支持工具调用平台（OpenAlex/Wikipedia 等）， 优先调用
+ * {@code ToolCallingSearchService}，失败或结果为空时回退到传统搜索引擎。 搜索失败最多重试 3 次，间隔 500ms，保证节点健壮性。 非
+ * Spring Bean，由使用节点在构造函数中手动创建。
  *
- * <p>被使用情况：被 {@code ResearcherNode} 和 {@code BackgroundInvestigationNode}
+ * <p>
+ * 被使用情况：被 {@code ResearcherNode} 和 {@code BackgroundInvestigationNode}
  * 在构造函数中实例化并持有，用于执行每个研究子任务的实际搜索请求。
  *
  * @author vlsmb
@@ -136,9 +137,8 @@ public class SearchInfoService {
 	/**
 	 * 支持工具调用的搜索方法，优先使用专用领域搜索服务，失败时回退到传统搜索引擎。
 	 * <p>
-	 * 工具调用平台（OpenAlex/Wikipedia 等）直接调用 ToolCallingSearchService；
-	 * 传统平台（Tavily/Aliyun 等）走 SearchFilterService 过滤管线。
-	 *
+	 * 工具调用平台（OpenAlex/Wikipedia 等）直接调用 ToolCallingSearchService； 传统平台（Tavily/Aliyun 等）走
+	 * SearchFilterService 过滤管线。
 	 * @param enableSearchFilter 是否启用搜索过滤
 	 * @param searchEnum 传统搜索引擎枚举（工具调用时作为回退）
 	 * @param query 搜索查询

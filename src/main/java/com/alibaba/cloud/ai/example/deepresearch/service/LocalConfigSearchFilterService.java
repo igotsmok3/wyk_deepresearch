@@ -31,12 +31,14 @@ import java.util.Map;
 /**
  * 基于本地 JSON 配置文件的搜索结果过滤服务，从 {@code website-weight-config.json} 中加载站点权重。
  *
- * <p>项目职责：继承 {@link SearchFilterService} 抽象类，实现 {@code loadWebsiteWeight()} 方法，
- * 从 classpath 下的 {@code website-weight-config.json} 解析域名→权重映射表，并做边界值校验（权重
- * 超出 [-1.0, 1.0] 范围时截断并告警）。权重正值表示信任，负值表示不信任，0 为中性。
+ * <p>
+ * 项目职责：继承 {@link SearchFilterService} 抽象类，实现 {@code loadWebsiteWeight()} 方法， 从 classpath
+ * 下的 {@code website-weight-config.json} 解析域名→权重映射表，并做边界值校验（权重 超出 [-1.0, 1.0]
+ * 范围时截断并告警）。权重正值表示信任，负值表示不信任，0 为中性。
  *
- * <p>被使用情况：作为 {@code SearchFilterService} 的默认实现注册为 Spring Bean，
- * 被 {@code ResearcherNode}、{@code BackgroundInvestigationNode} 以及 {@code SearchFilterTool}
+ * <p>
+ * 被使用情况：作为 {@code SearchFilterService} 的默认实现注册为 Spring Bean， 被
+ * {@code ResearcherNode}、{@code BackgroundInvestigationNode} 以及 {@code SearchFilterTool}
  * 注入，用于搜索结果的排序与过滤；亦被 {@code SearchInfoService} 间接使用。
  *
  * @author vlsmb

@@ -29,19 +29,20 @@ import java.util.Map;
 /**
  * 人工反馈节点：图执行的人工干预检查点，等待用户对研究计划进行确认或修改。
  *
- * <p>项目职责：位于 information 之后，研究执行之前（interrupt 点）。从 OverAllState 读取
- * {@code plan_iterations} 和 {@code human_feedback}，处理逻辑如下：
- * 超过最大迭代次数时直接放行；用户确认计划（feedback=true）时路由到 research_team；
- * 用户拒绝并提供修改意见（feedback=false）时路由到 planner 重新规划，并写入
- * {@code feedback_content}。写入 OverAllState：
+ * <p>
+ * 项目职责：位于 information 之后，研究执行之前（interrupt 点）。从 OverAllState 读取 {@code plan_iterations} 和
+ * {@code human_feedback}，处理逻辑如下： 超过最大迭代次数时直接放行；用户确认计划（feedback=true）时路由到 research_team；
+ * 用户拒绝并提供修改意见（feedback=false）时路由到 planner 重新规划，并写入 {@code feedback_content}。写入
+ * OverAllState：
  * <ul>
- *   <li>{@code human_next_node}：路由键，取值为 planner 或 research_team</li>
- *   <li>{@code plan_iterations}：迭代计数 +1</li>
- *   <li>{@code feedback_content}：用户反馈内容（可选）</li>
+ * <li>{@code human_next_node}：路由键，取值为 planner 或 research_team</li>
+ * <li>{@code plan_iterations}：迭代计数 +1</li>
+ * <li>{@code feedback_content}：用户反馈内容（可选）</li>
  * </ul>
  *
- * <p>被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code human_feedback} 注册到图中，
- * 并配置为 interrupt 前置点；{@code HumanFeedbackDispatcher} 读取 {@code human_next_node} 进行边路由。
+ * <p>
+ * 被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code human_feedback} 注册到图中， 并配置为
+ * interrupt 前置点；{@code HumanFeedbackDispatcher} 读取 {@code human_next_node} 进行边路由。
  *
  * @author yingzi
  * @since 2025/5/18 16:54

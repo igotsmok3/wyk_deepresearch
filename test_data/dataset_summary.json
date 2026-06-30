@@ -1,0 +1,11 @@
+{
+  "total_docs": 2000,
+  "relevant_docs": 283,
+  "total_queries": 60,
+  "queries_with_gt": 60,
+  "query_types": {
+    "semantic": 20,
+    "keyword": 20,
+    "hybrid": 20
+  }
+}

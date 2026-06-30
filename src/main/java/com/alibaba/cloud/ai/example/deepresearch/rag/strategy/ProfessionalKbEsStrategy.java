@@ -30,11 +30,13 @@ import java.util.Map;
 /**
  * 基于 Elasticsearch 的专业知识库检索策略，通过 HybridRagProcessor 执行 ES 混合检索（BM25 + KNN）。
  *
- * <p>项目职责：RetrievalStrategy 的 ES 类型实现，将 source_type 固定为 "professional_kb_es"，
- * 委托 HybridRagProcessor 完成完整的前处理→混合检索→后处理管道。
+ * <p>
+ * 项目职责：RetrievalStrategy 的 ES 类型实现，将 source_type 固定为 "professional_kb_es"， 委托
+ * HybridRagProcessor 完成完整的前处理→混合检索→后处理管道。
  *
- * <p>被使用情况：由 RagNodeService 注入并用于构建专业知识库 RagNode；
- * 策略名称为 "professionalKbEs"，与 UserFileRetrievalStrategy 区分数据来源。
+ * <p>
+ * 被使用情况：由 RagNodeService 注入并用于构建专业知识库 RagNode； 策略名称为 "professionalKbEs"，与
+ * UserFileRetrievalStrategy 区分数据来源。
  */
 @Component
 @ConditionalOnProperty(prefix = "spring.ai.alibaba.deepresearch.rag", name = "enabled", havingValue = "true")

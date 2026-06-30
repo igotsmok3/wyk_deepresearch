@@ -33,10 +33,12 @@ import java.net.URL;
 /**
  * 格式转换工具类，提供 Markdown → PDF 的完整转换链路。
  *
- * <p>项目职责：转换链路为 Markdown → XHTML（{@link HtmlGenerationUtil}）→ PDF（openhtmltopdf + PdfBox）；
+ * <p>
+ * 项目职责：转换链路为 Markdown → XHTML（{@link HtmlGenerationUtil}）→ PDF（openhtmltopdf + PdfBox）；
  * 嵌入阿里巴巴普惠体字体确保 PDF 中文显示正常；HTTP 资源加载超时设为 1 秒，防止外链资源阻塞渲染。
  *
- * <p>被使用情况：{@code ExportService} 调用 {@code convertMarkdownToPdfFile} 将报告导出为 PDF 文件；
+ * <p>
+ * 被使用情况：{@code ExportService} 调用 {@code convertMarkdownToPdfFile} 将报告导出为 PDF 文件；
  * {@code AsyncExportUtil} 调用 {@code convertMarkdownToPdfBytes} 进行异步 PDF 字节流生成；
  * {@code HtmlGenerationUtil} 作为本类的上游，负责 HTML 片段的生成与包装。
  *

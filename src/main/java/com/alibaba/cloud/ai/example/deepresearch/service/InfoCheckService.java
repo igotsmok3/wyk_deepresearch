@@ -37,12 +37,13 @@ import java.util.Map;
 /**
  * 背景信息核查服务，利用 AI 模型过滤搜索结果中的敏感或无关内容。
  *
- * <p>项目职责：根据 {@code backgroundInfoCheck.md} 提示模板，逐条调用 {@code infoCheckAgent}
- * 对搜索结果进行敏感性和相关性判断，并剔除不符合条件的条目，确保传递给后续节点的
- * 背景信息干净、安全。
+ * <p>
+ * 项目职责：根据 {@code backgroundInfoCheck.md} 提示模板，逐条调用 {@code infoCheckAgent}
+ * 对搜索结果进行敏感性和相关性判断，并剔除不符合条件的条目，确保传递给后续节点的 背景信息干净、安全。
  *
- * <p>被使用情况：被 {@code BackgroundInvestigationNode} 注入，在背景调查节点完成搜索后
- * 对原始结果进行过滤净化；也通过 {@code DeepResearchConfiguration} 装配到节点中。
+ * <p>
+ * 被使用情况：被 {@code BackgroundInvestigationNode} 注入，在背景调查节点完成搜索后 对原始结果进行过滤净化；也通过
+ * {@code DeepResearchConfiguration} 装配到节点中。
  */
 @Component
 public class InfoCheckService {

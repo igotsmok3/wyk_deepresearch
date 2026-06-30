@@ -31,17 +31,19 @@ import java.util.stream.Collectors;
 /**
  * 专业知识库决策节点：由 LLM 根据用户查询和各知识库描述判断是否需要查询专业知识库及选择哪些库。
  *
- * <p>项目职责：位于 research_team 之后，reporter 之前的可选分支入口。从 OverAllState 读取
- * {@code query}，结合 {@code RagProperties} 中配置的启用知识库列表，向 LLM 发送决策提示词，
- * 解析响应中的 {@code SELECTED: [id1, id2]} 格式得到选中库。写入 OverAllState：
+ * <p>
+ * 项目职责：位于 research_team 之后，reporter 之前的可选分支入口。从 OverAllState 读取 {@code query}，结合
+ * {@code RagProperties} 中配置的启用知识库列表，向 LLM 发送决策提示词， 解析响应中的 {@code SELECTED: [id1, id2]}
+ * 格式得到选中库。写入 OverAllState：
  * <ul>
- *   <li>{@code use_professional_kb}：是否需要查询专业知识库</li>
- *   <li>{@code selected_knowledge_bases}：选中的知识库 ID 列表</li>
+ * <li>{@code use_professional_kb}：是否需要查询专业知识库</li>
+ * <li>{@code selected_knowledge_bases}：选中的知识库 ID 列表</li>
  * </ul>
  *
- * <p>被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code professional_kb_decision}
- * 注册到图中；{@code ProfessionalKbDispatcher} 读取 {@code use_professional_kb} 进行边路由：
- * true 时路由到 professional_kb_rag，false 时直接路由到 reporter。
+ * <p>
+ * 被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code professional_kb_decision}
+ * 注册到图中；{@code ProfessionalKbDispatcher} 读取 {@code use_professional_kb} 进行边路由： true 时路由到
+ * professional_kb_rag，false 时直接路由到 reporter。
  *
  * @author hupei
  */

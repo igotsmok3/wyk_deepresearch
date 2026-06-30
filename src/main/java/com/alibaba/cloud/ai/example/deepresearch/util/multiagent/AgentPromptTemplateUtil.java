@@ -24,12 +24,15 @@ import static com.alibaba.cloud.ai.example.deepresearch.util.ResourceUtil.loadFi
 /**
  * Agent 提示词模板工具类，从 classpath 中加载 Markdown 文件并以字符串形式返回提示词内容。
  *
- * <p>项目职责：统一管理多智能 Agent 子系统的提示词文件路径和加载逻辑，
- * 支持按 {@code AgentType} 获取对应的系统提示词，以及获取问题分类器和搜索平台选择器的专用提示词。
+ * <p>
+ * 项目职责：统一管理多智能 Agent 子系统的提示词文件路径和加载逻辑， 支持按 {@code AgentType}
+ * 获取对应的系统提示词，以及获取问题分类器和搜索平台选择器的专用提示词。
  *
- * <p>被使用情况：{@code AgentsConfiguration} 调用 {@code buildCompletePrompt} 为各类 Agent 构建完整提示词；
+ * <p>
+ * 被使用情况：{@code AgentsConfiguration} 调用 {@code buildCompletePrompt} 为各类 Agent 构建完整提示词；
  * {@code QuestionClassifierService} 调用 {@code getClassificationPrompt} 获取分类器提示词；
- * {@code SearchPlatformSelectionService} 调用 {@code getSearchPlatformSelectionPrompt} 获取平台选择提示词。
+ * {@code SearchPlatformSelectionService} 调用 {@code getSearchPlatformSelectionPrompt}
+ * 获取平台选择提示词。
  *
  * @author Makoto
  * @since 2025/07/17

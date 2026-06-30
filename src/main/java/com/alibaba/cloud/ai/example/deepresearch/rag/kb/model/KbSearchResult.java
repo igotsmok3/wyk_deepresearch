@@ -21,11 +21,13 @@ import java.util.Map;
 /**
  * 专业知识库搜索结果的不可变数据模型，统一封装来自不同知识库 API 的检索条目。
  *
- * <p>项目职责：知识库层统一数据传输对象（DTO），由 CustomKbApiClient 和 DashScopeKbApiClient
- * 的 search() 方法返回，再由 ProfessionalKbApiStrategy 将其转换为 Spring AI Document 格式。
+ * <p>
+ * 项目职责：知识库层统一数据传输对象（DTO），由 CustomKbApiClient 和 DashScopeKbApiClient 的 search() 方法返回，再由
+ * ProfessionalKbApiStrategy 将其转换为 Spring AI Document 格式。
  *
- * <p>被使用情况：ProfessionalKbApiClient 接口的 search() 返回值类型；
- * ProfessionalKbApiStrategy 负责将 KbSearchResult 列表转换为 RAG 管道所需的 Document 列表。
+ * <p>
+ * 被使用情况：ProfessionalKbApiClient 接口的 search() 返回值类型； ProfessionalKbApiStrategy 负责将
+ * KbSearchResult 列表转换为 RAG 管道所需的 Document 列表。
  *
  * @author hupei
  */

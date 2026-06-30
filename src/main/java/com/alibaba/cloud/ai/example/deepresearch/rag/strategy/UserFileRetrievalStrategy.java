@@ -29,11 +29,13 @@ import java.util.Map;
 /**
  * 用户上传文件的检索策略，根据 session_id 隔离并检索当前会话用户上传的文档。
  *
- * <p>项目职责：RetrievalStrategy 的用户文件实现，将 source_type 固定为 "user_upload"，
- * 要求 options 中必须携带有效的 session_id，委托 HybridRagProcessor 执行完整检索流程。
+ * <p>
+ * 项目职责：RetrievalStrategy 的用户文件实现，将 source_type 固定为 "user_upload"， 要求 options 中必须携带有效的
+ * session_id，委托 HybridRagProcessor 执行完整检索流程。
  *
- * <p>被使用情况：由 RagNodeService 注入并用于构建用户文件 RagNode；
- * 策略名称为 "userFile"，无 session_id 时直接返回空列表保护隐私边界。
+ * <p>
+ * 被使用情况：由 RagNodeService 注入并用于构建用户文件 RagNode； 策略名称为 "userFile"，无 session_id
+ * 时直接返回空列表保护隐私边界。
  */
 @Component
 @ConditionalOnProperty(prefix = "spring.ai.alibaba.deepresearch.rag", name = "enabled", havingValue = "true")

@@ -30,14 +30,15 @@ import org.springframework.stereotype.Service;
 /**
  * 问题分类服务，通过 AI 模型将用户问题归类为对应的 {@code AgentType}。
  *
- * <p>项目职责：使用 DashScope 聊天模型和 {@code AgentPromptTemplateUtil} 生成的分类提示，
- * 对用户问题做意图分类（学术研究、生活旅游、百科、数据分析或通用研究），
- * 为后续的搜索平台选择和 Agent 路由提供决策依据。
- * 仅在 {@code spring.ai.alibaba.deepresearch.smart-agents.enabled=true} 时注册为 Bean。
+ * <p>
+ * 项目职责：使用 DashScope 聊天模型和 {@code AgentPromptTemplateUtil} 生成的分类提示，
+ * 对用户问题做意图分类（学术研究、生活旅游、百科、数据分析或通用研究）， 为后续的搜索平台选择和 Agent 路由提供决策依据。 仅在
+ * {@code spring.ai.alibaba.deepresearch.smart-agents.enabled=true} 时注册为 Bean。
  *
- * <p>被使用情况：被 {@code SmartAgentDispatcherService}、{@code SmartAgentSelectionHelperService}
- * 和 {@code BackgroundInvestigationNode} 注入，在问题路由和背景调查阶段执行分类；
- * 也通过 {@code AgentIntegrationUtil} 间接使用。
+ * <p>
+ * 被使用情况：被 {@code SmartAgentDispatcherService}、{@code SmartAgentSelectionHelperService} 和
+ * {@code BackgroundInvestigationNode} 注入，在问题路由和背景调查阶段执行分类； 也通过
+ * {@code AgentIntegrationUtil} 间接使用。
  *
  * @author Makoto
  * @since 2025/07/17

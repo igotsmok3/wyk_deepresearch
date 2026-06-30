@@ -75,6 +75,9 @@
 - `spring.ai.alibaba.deepresearch.smart-agents.enabled`
 - `spring.ai.alibaba.deepresearch.mcp.enabled`
 - `spring.ai.alibaba.deepresearch.rag.enabled`
+- `spring.ai.alibaba.deepresearch.rag.vector-store-type`: `simple` (default) | `elasticsearch` | `milvus` | `milvus-es` (Milvus 向量 + ES BM25 双路并行，应用层 RRF 融合)
+- `spring.ai.alibaba.deepresearch.rag.markdown-splitter.enabled`: Markdown 结构感知切分，默认 `true`，关闭后降级到 TokenTextSplitter
+- `spring.ai.alibaba.deepresearch.rag.pdf-splitter.enabled`: PDF 结构感知切分（书签模式/启发式模式），默认 `true`，关闭后降级到 TokenTextSplitter
 - `spring.data.redis.enabled`
 - `spring.ai.alibaba.deepresearch.short-term-memory.enabled`
 - `spring.ai.alibaba.deepresearch.reflection.enabled`

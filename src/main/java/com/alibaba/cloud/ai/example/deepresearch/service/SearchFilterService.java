@@ -36,13 +36,14 @@ import java.util.stream.Stream;
 /**
  * 搜索结果过滤与排序抽象基类，根据站点权重配置对搜索结果做排序和黑白名单过滤。
  *
- * <p>项目职责：定义搜索结果后处理的核心逻辑——加载站点权重、执行"首尾高权重"排列算法
- * （将高可信域名排在列表首尾以利用 LLM 注意力偏置）、以及过滤权重为负的黑名单站点。
+ * <p>
+ * 项目职责：定义搜索结果后处理的核心逻辑——加载站点权重、执行"首尾高权重"排列算法 （将高可信域名排在列表首尾以利用 LLM 注意力偏置）、以及过滤权重为负的黑名单站点。
  * 子类只需实现 {@code loadWebsiteWeight()} 提供权重来源即可复用全部过滤逻辑。
  *
- * <p>被使用情况：由 {@link LocalConfigSearchFilterService} 继承并注册为 Spring Bean，
- * 被 {@code SearchInfoService}、{@code ResearcherNode}、{@code BackgroundInvestigationNode}
- * 和 {@code SearchFilterTool} 使用；单元测试中通过匿名子类 {@code TestSearchFilterService} 覆盖。
+ * <p>
+ * 被使用情况：由 {@link LocalConfigSearchFilterService} 继承并注册为 Spring Bean， 被
+ * {@code SearchInfoService}、{@code ResearcherNode}、{@code BackgroundInvestigationNode} 和
+ * {@code SearchFilterTool} 使用；单元测试中通过匿名子类 {@code TestSearchFilterService} 覆盖。
  *
  * @author vlsmb
  * @since 2025/7/10
@@ -87,15 +88,13 @@ public abstract class SearchFilterService {
 	 * position search results with high trust weights at both ends of the message list,
 	 * while placing items with lower weights toward the center.
 	 *
-	 * <p>排列算法（"首尾高权重"策略）：
-	 * <pre>
+	 * <p>
+	 * 排列算法（"首尾高权重"策略）： <pre>
 	 * 原始按权重降序：[A(1.0), B(0.8), C(0.5), D(0.3), E(0.1)]
 	 * 偶数索引 → 前半段（保持顺序）：[A, C, E]
 	 * 奇数索引 → 后半段（反转顺序）：[D, B]
 	 * 最终拼接：[A, C, E, D, B]
-	 * </pre>
-	 * 效果：权重最高的 A 在最前，第二高的 B 在最后，利用 LLM 对序列首尾的注意力偏置提升权威来源的影响力。
-	 *
+	 * </pre> 效果：权重最高的 A 在最前，第二高的 B 在最后，利用 LLM 对序列首尾的注意力偏置提升权威来源的影响力。
 	 * @param isEnabled Whether to reorder search results based on trust weights (default:
 	 * true). If set to false, all returned weight fields become 0.0.
 	 * @param result SearchService.SearchResult

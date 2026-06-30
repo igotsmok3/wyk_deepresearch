@@ -29,21 +29,23 @@ import java.util.*;
 /**
  * 用户角色短期记忆节点：整个图的入口节点，负责提取并维护用户画像，为后续节点的提示词注入个性化上下文。
  *
- * <p>项目职责：位于 START 之后，coordinator 之前（{@code START → short_user_role_memory → coordinator}）。
+ * <p>
+ * 项目职责：位于 START 之后，coordinator 之前（{@code START → short_user_role_memory → coordinator}）。
  * 每次请求时依次执行：
  * <ol>
- *   <li>从 {@code ShortTermMemoryRepository} 取最近 N 条历史提问，构建 LLM 上下文</li>
- *   <li>调用 shortMemoryAgent 提取当前提问中的用户职业/偏好/置信度等结构化画像
- *       （{@code ShortUserRoleExtractResult}）</li>
- *   <li>与历史画像对比置信度：新置信度更高时调用 LLM 合并两次画像；否则保留历史画像仅更新计数</li>
+ * <li>从 {@code ShortTermMemoryRepository} 取最近 N 条历史提问，构建 LLM 上下文</li>
+ * <li>调用 shortMemoryAgent 提取当前提问中的用户职业/偏好/置信度等结构化画像
+ * （{@code ShortUserRoleExtractResult}）</li>
+ * <li>与历史画像对比置信度：新置信度更高时调用 LLM 合并两次画像；否则保留历史画像仅更新计数</li>
  * </ol>
  * 写入 OverAllState：
  * <ul>
- *   <li>{@code short_user_role_memory}：画像 JSON（根据 guideScope 配置决定是否写入）</li>
- *   <li>{@code short_user_role_next_node}：路由键，固定为 coordinator</li>
+ * <li>{@code short_user_role_memory}：画像 JSON（根据 guideScope 配置决定是否写入）</li>
+ * <li>{@code short_user_role_next_node}：路由键，固定为 coordinator</li>
  * </ul>
  *
- * <p>被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code short_user_role_memory} 注册到图中；
+ * <p>
+ * 被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code short_user_role_memory} 注册到图中；
  * {@code ShortUserRoleMemoryDispatcher} 读取 {@code short_user_role_next_node} 进行边路由；
  * {@code TemplateUtil#addShortUserRoleMemory} 从 OverAllState 读取画像 JSON 并注入后续节点的提示词；
  * {@code ShortTermMemoryProperties} 控制功能开关和 guideScope 模式。
@@ -207,9 +209,8 @@ public class ShortUserRoleMemoryNode implements NodeAction {
 	/**
 	 * 核心置信度比较逻辑：决定是"合并更新"还是"只更新计数"。
 	 * <p>
-	 * 设计意图：防止用户偶尔一句角色扮演的话覆盖掉积累的真实画像。
-	 * 置信度由 LLM 在提取时打分，反映这条信息能多确定地代表用户真实身份。
-	 * 只有新提取的置信度 >= 历史置信度时，才触发 LLM 合并，否则保留历史画像原样。
+	 * 设计意图：防止用户偶尔一句角色扮演的话覆盖掉积累的真实画像。 置信度由 LLM 在提取时打分，反映这条信息能多确定地代表用户真实身份。 只有新提取的置信度 >=
+	 * 历史置信度时，才触发 LLM 合并，否则保留历史画像原样。
 	 */
 	private ShortUserRoleExtractResult saveOrUpdateShortTermMemory(OverAllState state,
 			ShortUserRoleExtractResult currentResult) throws IOException {

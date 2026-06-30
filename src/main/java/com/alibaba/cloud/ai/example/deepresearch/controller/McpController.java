@@ -32,11 +32,13 @@ import java.util.Map;
 /**
  * MCP 服务信息查询控制器，提供系统已配置的 MCP 服务列表查询接口。
  *
- * <p>项目职责：controller 层的辅助接口，暴露 {@code /api/mcp/services} REST 端点，
- * 通过 {@link com.alibaba.cloud.ai.example.deepresearch.service.McpService} 读取
- * 当前运行时所有已注册的 MCP 工具服务器信息，供前端展示和配置选择使用。
+ * <p>
+ * 项目职责：controller 层的辅助接口，暴露 {@code /api/mcp/services} REST 端点， 通过
+ * {@link com.alibaba.cloud.ai.example.deepresearch.service.McpService} 读取 当前运行时所有已注册的 MCP
+ * 工具服务器信息，供前端展示和配置选择使用。
  *
- * <p>被使用情况：由 Spring 容器直接管理，无其他 Java 类直接引用。
+ * <p>
+ * 被使用情况：由 Spring 容器直接管理，无其他 Java 类直接引用。
  */
 @RestController
 @RequestMapping("/api/mcp")

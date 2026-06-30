@@ -24,13 +24,15 @@ import static com.alibaba.cloud.ai.graph.StateGraph.END;
 /**
  * {@code background_investigator} 节点的条件边路由器，根据背景调查结果决定下一跳节点。
  *
- * <p>项目职责：dispatcher 层的边路由实现，读取 {@code BackgroundInvestigationNode} 执行后
- * 写入状态的 {@code background_investigation_next_node} 键，将图流程引导至：
- * {@code "planner"}（调查充分，进入规划）、{@code "reporter"}（问题简单，直接生成报告）
- * 或 {@code END}（异常终止）。
+ * <p>
+ * 项目职责：dispatcher 层的边路由实现，读取 {@code BackgroundInvestigationNode} 执行后 写入状态的
+ * {@code background_investigation_next_node} 键，将图流程引导至：
+ * {@code "planner"}（调查充分，进入规划）、{@code "reporter"}（问题简单，直接生成报告） 或 {@code END}（异常终止）。
  *
- * <p>被使用情况：由 {@link com.alibaba.cloud.ai.example.deepresearch.config.DeepResearchConfiguration}
- * 通过 {@code addConditionalEdges("background_investigator", ...)} 注册到图配置中。
+ * <p>
+ * 被使用情况：由
+ * {@link com.alibaba.cloud.ai.example.deepresearch.config.DeepResearchConfiguration} 通过
+ * {@code addConditionalEdges("background_investigator", ...)} 注册到图配置中。
  */
 public class BackgroundInvestigationDispatcher implements EdgeAction {
 

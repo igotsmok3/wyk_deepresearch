@@ -25,11 +25,12 @@ import java.util.List;
 /**
  * 简单的文档后处理器，从检索结果中只保留排名第一的文档，用于节省 LLM 上下文窗口。
  *
- * <p>项目职责：RAG 后处理阶段的截断策略，实现 Spring AI 的 DocumentPostProcessor 接口，
- * 当 postProcessingSelectFirstEnabled=true 时由 DefaultHybridRagProcessor 使用。
+ * <p>
+ * 项目职责：RAG 后处理阶段的截断策略，实现 Spring AI 的 DocumentPostProcessor 接口， 当
+ * postProcessingSelectFirstEnabled=true 时由 DefaultHybridRagProcessor 使用。
  *
- * <p>被使用情况：在 DefaultHybridRagProcessor 的构造器中按条件实例化，
- * 作为 postProcess 阶段的最终截断处理器。
+ * <p>
+ * 被使用情况：在 DefaultHybridRagProcessor 的构造器中按条件实例化， 作为 postProcess 阶段的最终截断处理器。
  *
  * @author yingzi
  */

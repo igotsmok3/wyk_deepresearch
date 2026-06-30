@@ -36,14 +36,17 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
- * Agent 模型配置类，根据 {@code model-config.json} 文件为各 Agent 创建对应的 {@link ChatClient.Builder} Bean。
+ * Agent 模型配置类，根据 {@code model-config.json} 文件为各 Agent 创建对应的 {@link ChatClient.Builder}
+ * Bean。
  *
- * <p>项目职责：属于配置层，负责在应用启动时将 model-config.json 中定义的模型参数转换为
- * {@link DashScopeChatModel} 实例，并以 {@code <agentName>ChatClientBuilder} 为名称注册到 Spring 容器，
- * 供各 Agent Bean（如 researchAgent、coderAgent 等）在 {@link AgentsConfiguration} 中按名称注入。
+ * <p>
+ * 项目职责：属于配置层，负责在应用启动时将 model-config.json 中定义的模型参数转换为 {@link DashScopeChatModel} 实例，并以
+ * {@code <agentName>ChatClientBuilder} 为名称注册到 Spring 容器， 供各 Agent Bean（如
+ * researchAgent、coderAgent 等）在 {@link AgentsConfiguration} 中按名称注入。
  *
- * <p>被使用情况：由 Spring 容器直接管理，其注册的动态 Builder Bean 被 {@code AgentsConfiguration}
- * 中各 {@code @Bean} 方法以参数形式注入使用。
+ * <p>
+ * 被使用情况：由 Spring 容器直接管理，其注册的动态 Builder Bean 被 {@code AgentsConfiguration} 中各
+ * {@code @Bean} 方法以参数形式注入使用。
  *
  * @author ViliamSun
  * @since 0.1.0
@@ -64,23 +67,20 @@ public class AgentModelsConfiguration implements InitializingBean {
 	private final ToolCallingManager toolCallingManager;
 
 	/**
-	 * 将一个模型注册为 Spring Bean 的函数式操作：
-	 * key   = Agent 名称（如 "researcher"）
-	 * value = 对应的 DashScopeChatModel 实例
-	 * 注册后 Bean 名称变为 "researcherChatClientBuilder"，供 AgentsConfiguration 按名注入。
+	 * 将一个模型注册为 Spring Bean 的函数式操作： key = Agent 名称（如 "researcher"） value = 对应的
+	 * DashScopeChatModel 实例 注册后 Bean 名称变为 "researcherChatClientBuilder"，供
+	 * AgentsConfiguration 按名注入。
 	 */
 	private final BiConsumer<String, DashScopeChatModel> registerConsumer;
 
 	/**
-	 * 构造方法——Spring 启动时自动调用，完成以下三件事：
-	 * 1. 从 ModelParamRepository 加载 model-config.json 中定义的所有模型参数
-	 * 2. 保存 DashScope API Key 等连接信息
-	 * 3. 准备好"注册 Bean"的逻辑（registerConsumer），等 afterPropertiesSet 时批量执行
-	 *
-	 * @param modelParamRepository       模型参数仓库，负责读取 JSON 配置
-	 * @param beanFactory                Spring Bean 工厂，用于动态注册 Bean
-	 * @param dashScopeConnectionProperties  DashScope 连接属性（含 apiKey）
-	 * @param toolCallingManager         工具调用管理器
+	 * 构造方法——Spring 启动时自动调用，完成以下三件事： 1. 从 ModelParamRepository 加载 model-config.json
+	 * 中定义的所有模型参数 2. 保存 DashScope API Key 等连接信息 3. 准备好"注册 Bean"的逻辑（registerConsumer），等
+	 * afterPropertiesSet 时批量执行
+	 * @param modelParamRepository 模型参数仓库，负责读取 JSON 配置
+	 * @param beanFactory Spring Bean 工厂，用于动态注册 Bean
+	 * @param dashScopeConnectionProperties DashScope 连接属性（含 apiKey）
+	 * @param toolCallingManager 工具调用管理器
 	 */
 	public AgentModelsConfiguration(ModelParamRepository modelParamRepository, ConfigurableBeanFactory beanFactory,
 			DashScopeConnectionProperties dashScopeConnectionProperties, ToolCallingManager toolCallingManager) {
@@ -98,20 +98,20 @@ public class AgentModelsConfiguration implements InitializingBean {
 	/**
 	 * 将 model-config.json 中的每条 AgentModel 配置转换为 DashScopeChatModel 实例。
 	 *
-	 * <p>转换规则：
+	 * <p>
+	 * 转换规则：
 	 * <ul>
-	 *   <li>以 AgentModel 的 name 字段作为 Map 的 key（如 "researcher"、"coder"）</li>
-	 *   <li>用 AgentModel 的 modelName 字段指定底层大模型（如 "qwen-max"）</li>
-	 *   <li>若配置文件中存在同名重复项，保留第一条，忽略后续重复项</li>
+	 * <li>以 AgentModel 的 name 字段作为 Map 的 key（如 "researcher"、"coder"）</li>
+	 * <li>用 AgentModel 的 modelName 字段指定底层大模型（如 "qwen-max"）</li>
+	 * <li>若配置文件中存在同名重复项，保留第一条，忽略后续重复项</li>
 	 * </ul>
-	 *
 	 * @return key=Agent名称, value=对应的 DashScopeChatModel 实例
 	 */
 	private Map<String, DashScopeChatModel> agentModels() {
 		return models.stream()
 			.filter(Objects::nonNull) // 过滤掉 JSON 中可能存在的 null 条目
-			.collect(Collectors.toMap(
-					ModelParamRepositoryImpl.AgentModel::name, // key：Agent 名称
+			.collect(Collectors.toMap(ModelParamRepositoryImpl.AgentModel::name, // key：Agent
+																					// 名称
 					model -> DashScopeChatModel.builder()
 						// 使用公共 API Key 创建 DashScope API 客户端
 						.dashScopeApi(DashScopeApi.builder().apiKey(commonProperties.getApiKey()).build())
@@ -119,7 +119,7 @@ public class AgentModelsConfiguration implements InitializingBean {
 						.toolCallingManager(toolCallingManager)
 						// 设置默认推理参数：指定模型名称和温度值
 						.defaultOptions(DashScopeChatOptions.builder()
-							.withModel(model.modelName())                        // 具体模型，如 "qwen-max"
+							.withModel(model.modelName()) // 具体模型，如 "qwen-max"
 							.withTemperature(DashScopeChatModel.DEFAULT_TEMPERATURE) // 默认温度（控制随机性）
 							.build())
 						.build(),
@@ -128,9 +128,9 @@ public class AgentModelsConfiguration implements InitializingBean {
 	}
 
 	/**
-	 * Spring 容器初始化完成后自动回调此方法（来自 InitializingBean 接口）。
-	 * 遍历所有 Agent 模型，逐一调用 registerConsumer 将其注册为 Spring Bean，
-	 * 注册后各 Agent 可通过名称（如 "researcherChatClientBuilder"）从容器中获取对应的 ChatClient.Builder。
+	 * Spring 容器初始化完成后自动回调此方法（来自 InitializingBean 接口）。 遍历所有 Agent 模型，逐一调用 registerConsumer
+	 * 将其注册为 Spring Bean， 注册后各 Agent 可通过名称（如 "researcherChatClientBuilder"）从容器中获取对应的
+	 * ChatClient.Builder。
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {

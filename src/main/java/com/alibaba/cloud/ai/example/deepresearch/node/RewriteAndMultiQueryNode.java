@@ -41,20 +41,22 @@ import static com.alibaba.cloud.ai.graph.StateGraph.END;
 /**
  * 查询优化节点：对用户原始提问执行三步优化，将结果存入 OverAllState 供后续检索节点使用。
  *
- * <p>项目职责：位于 coordinator（触发深度研究）之后，background_investigator / user_file_rag 之前。
- * 依次执行：
+ * <p>
+ * 项目职责：位于 coordinator（触发深度研究）之后，background_investigator / user_file_rag 之前。 依次执行：
  * <ol>
- *   <li>{@code CompressionQueryTransformer}（可选）：消解多轮对话中的代词引用，将相对表达转为完整问题</li>
- *   <li>{@code RewriteQueryTransformer}：语义重写，去除口语化噪音，提升精准度</li>
- *   <li>{@code MultiQueryExpander}：扩展为 N 条语义变体（含原始查询），并行检索后提升召回率</li>
+ * <li>{@code CompressionQueryTransformer}（可选）：消解多轮对话中的代词引用，将相对表达转为完整问题</li>
+ * <li>{@code RewriteQueryTransformer}：语义重写，去除口语化噪音，提升精准度</li>
+ * <li>{@code MultiQueryExpander}：扩展为 N 条语义变体（含原始查询），并行检索后提升召回率</li>
  * </ol>
  * 写入 OverAllState：
  * <ul>
- *   <li>{@code optimize_queries}：优化后的多条查询字符串列表</li>
- *   <li>{@code rewrite_multi_query_next_node}：路由键，用户上传文件时为 user_file_rag，否则为 background_investigator</li>
+ * <li>{@code optimize_queries}：优化后的多条查询字符串列表</li>
+ * <li>{@code rewrite_multi_query_next_node}：路由键，用户上传文件时为 user_file_rag，否则为
+ * background_investigator</li>
  * </ul>
  *
- * <p>被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code rewrite_multi_query} 注册到图中；
+ * <p>
+ * 被使用情况：由 {@code DeepResearchConfiguration} 以节点名 {@code rewrite_multi_query} 注册到图中；
  * {@code RewriteAndMultiQueryDispatcher} 读取 {@code rewrite_multi_query_next_node} 进行边路由；
  * {@code CoordinatorNode} 触发工具调用时路由到本节点。
  *
@@ -123,7 +125,7 @@ public class RewriteAndMultiQueryNode implements NodeAction {
 		optimizeQueryNum = Math.max(MinOptimizeQueryNum, Math.min(MaxOptimizeQueryNum, optimizeQueryNum));
 		QueryExpander queryExpander = MultiQueryExpander.builder()
 			.chatClientBuilder(rewriteAndMultiQueryAgentBuilder)
-			.includeOriginal(true)      // 扩展结果包含原始（重写后的）查询，保证原意不丢失
+			.includeOriginal(true) // 扩展结果包含原始（重写后的）查询，保证原意不丢失
 			.numberOfQueries(optimizeQueryNum)
 			.build();
 

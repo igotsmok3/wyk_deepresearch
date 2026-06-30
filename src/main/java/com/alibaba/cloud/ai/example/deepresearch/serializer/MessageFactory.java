@@ -25,11 +25,13 @@ import java.util.Map;
 /**
  * {@code Message} 实例的创建工厂函数接口，供 {@link MessageDeserializer} 按消息类型路由调用。
  *
- * <p>项目职责：以函数式接口的形式封装各消息类型（USER/ASSISTANT/SYSTEM/TOOL）的构造逻辑，
- * 在 {@code MessageDeserializer} 的静态注册表中存储，实现按类型名称分发的消息创建策略。
+ * <p>
+ * 项目职责：以函数式接口的形式封装各消息类型（USER/ASSISTANT/SYSTEM/TOOL）的构造逻辑， 在 {@code MessageDeserializer}
+ * 的静态注册表中存储，实现按类型名称分发的消息创建策略。
  *
- * <p>被使用情况：由 {@code MessageDeserializer} 的静态初始化块注册，
- * 在反序列化 {@code Message} 对象时根据消息类型调用对应的 {@code create} 方法。
+ * <p>
+ * 被使用情况：由 {@code MessageDeserializer} 的静态初始化块注册， 在反序列化 {@code Message} 对象时根据消息类型调用对应的
+ * {@code create} 方法。
  *
  * @author benym
  * @since 2025/9/3 16:30

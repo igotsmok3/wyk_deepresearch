@@ -22,13 +22,16 @@ import com.alibaba.cloud.ai.graph.action.EdgeAction;
 /**
  * {@code research_team} 节点的条件边路由器，控制并行研究任务的循环与退出。
  *
- * <p>项目职责：dispatcher 层的边路由实现，读取 {@code ResearchTeamNode}（并行 researcher/coder
- * 节点的汇聚点）写入的 {@code research_team_next_node} 键：仍有未完成步骤时路由至
- * {@code "parallel_executor"} 继续分发，全部步骤完成后路由至 {@code "professional_kb_decision"}；
- * 缺省值为 {@code "planner"} 以防止状态键缺失时意外终止图。
+ * <p>
+ * 项目职责：dispatcher 层的边路由实现，读取 {@code ResearchTeamNode}（并行 researcher/coder 节点的汇聚点）写入的
+ * {@code research_team_next_node} 键：仍有未完成步骤时路由至 {@code "parallel_executor"}
+ * 继续分发，全部步骤完成后路由至 {@code "professional_kb_decision"}； 缺省值为 {@code "planner"}
+ * 以防止状态键缺失时意外终止图。
  *
- * <p>被使用情况：由 {@link com.alibaba.cloud.ai.example.deepresearch.config.DeepResearchConfiguration}
- * 通过 {@code addConditionalEdges("research_team", ...)} 注册到图配置中。
+ * <p>
+ * 被使用情况：由
+ * {@link com.alibaba.cloud.ai.example.deepresearch.config.DeepResearchConfiguration} 通过
+ * {@code addConditionalEdges("research_team", ...)} 注册到图配置中。
  */
 public class ResearchTeamDispatcher implements EdgeAction {
 

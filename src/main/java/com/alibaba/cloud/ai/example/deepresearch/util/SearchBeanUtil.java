@@ -28,11 +28,12 @@ import java.util.Optional;
 /**
  * 搜索 Bean 工具服务，基于配置的搜索引擎列表提供 {@code SearchService} 实例的查找和首个可用引擎的获取。
  *
- * <p>项目职责：从 Spring ApplicationContext 中按需加载搜索服务 Bean，并根据
- * {@code DeepResearchProperties.searchList} 中配置的搜索引擎白名单过滤，
- * 防止使用未在项目中配置的搜索插件。
+ * <p>
+ * 项目职责：从 Spring ApplicationContext 中按需加载搜索服务 Bean，并根据
+ * {@code DeepResearchProperties.searchList} 中配置的搜索引擎白名单过滤， 防止使用未在项目中配置的搜索插件。
  *
- * <p>被使用情况：{@code ChatController} 和 {@code ChatRequestProcess} 在处理请求时
+ * <p>
+ * 被使用情况：{@code ChatController} 和 {@code ChatRequestProcess} 在处理请求时
  * 通过本类校验搜索引擎合法性；{@code SearchFilterService} 和 {@code LocalConfigSearchFilterService}
  * 使用本类获取具体的 {@code SearchService} 实例执行搜索。
  *

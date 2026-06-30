@@ -40,11 +40,13 @@ import java.util.stream.Collectors;
 /**
  * 基于 Elasticsearch 的混合检索器，同时执行 BM25 关键词检索和 KNN 向量检索，并用 RRF 算法融合排序。
  *
- * <p>项目职责：RAG 检索层的核心实现，向 ES 发送混合查询（BM25 + KNN + RRF）或纯 KNN 查询，
- * 支持通过 filterExpression 按 source_type / session_id / user_id 对结果进行隔离过滤。
+ * <p>
+ * 项目职责：RAG 检索层的核心实现，向 ES 发送混合查询（BM25 + KNN + RRF）或纯 KNN 查询， 支持通过 filterExpression 按
+ * source_type / session_id / user_id 对结果进行隔离过滤。
  *
- * <p>被使用情况：由 DefaultHybridRagProcessor 在 Elasticsearch 混合模式开启时实例化，
- * 作为 hybridRetrieve 阶段的检索后端；当 ES 或 hybrid 未启用时降级为向量存储直接检索。
+ * <p>
+ * 被使用情况：由 DefaultHybridRagProcessor 在 Elasticsearch 混合模式开启时实例化， 作为 hybridRetrieve
+ * 阶段的检索后端；当 ES 或 hybrid 未启用时降级为向量存储直接检索。
  *
  * @author hupei
  * @author ViliamSun
@@ -130,8 +132,8 @@ public class RrfHybridElasticsearchRetriever implements DocumentRetriever {
 	}
 
 	/**
-	 * 核心检索入口：将查询文本向量化，构建 ES 搜索请求。
-	 * hasHybrid=false 时仅 KNN 向量检索；hasHybrid=true 时 KNN + BM25 + RRF 混合。
+	 * 核心检索入口：将查询文本向量化，构建 ES 搜索请求。 hasHybrid=false 时仅 KNN 向量检索；hasHybrid=true 时 KNN + BM25
+	 * + RRF 混合。
 	 */
 	public List<Document> search(String text, boolean hasHybrid,
 			co.elastic.clients.elasticsearch._types.query_dsl.Query filter) throws IOException {
@@ -141,8 +143,8 @@ public class RrfHybridElasticsearchRetriever implements DocumentRetriever {
 			Builder knnBuilder = sr.index(indexName)
 				.postFilter(filter) // 先召回后过滤（postFilter 不影响 KNN 评分）
 				.knn(knn -> knn.queryVector(EmbeddingUtils.toList(vector))
-					.similarity(0.0f)       // 不做相似度阈值过滤，由 RRF 统一处理
-					.k(windowSize)          // 返回 top-k 个向量近邻
+					.similarity(0.0f) // 不做相似度阈值过滤，由 RRF 统一处理
+					.k(windowSize) // 返回 top-k 个向量近邻
 					.field("embedding")
 					.numCandidates(Math.max(windowSize * 2, 10)) // 候选池=k*2，提升召回精度
 					.boost(knnBoost));
@@ -153,6 +155,38 @@ public class RrfHybridElasticsearchRetriever implements DocumentRetriever {
 		}, Document.class);
 
 		return response.hits().hits().stream().map(this::toDocument).collect(Collectors.toList());
+	}
+
+	/**
+	 * 应用层双路检索：分别执行 KNN 向量检索和 BM25 文本检索，返回两路独立结果列表，由调用方在应用层做 RRF 融合。 适用于 ES 基础许可证（rank.rrf
+	 * 需要企业许可证的情况下的替代方案）。
+	 */
+	public List<List<Document>> searchTwoPaths(String text,
+			co.elastic.clients.elasticsearch._types.query_dsl.Query filter) throws IOException {
+		float[] vector = embeddingModel.embed(text);
+
+		// 路径1: KNN 向量检索
+		SearchResponse<Document> knnResponse = elasticsearchClient.search(sr -> sr.index(indexName)
+			.postFilter(filter)
+			.knn(knn -> knn.queryVector(EmbeddingUtils.toList(vector))
+				.similarity(0.0f)
+				.k(windowSize)
+				.field("embedding")
+				.numCandidates(Math.max(windowSize * 2, 10))), Document.class);
+		List<Document> knnDocs = knnResponse.hits().hits().stream().map(this::toDocument).collect(Collectors.toList());
+
+		// 路径2: BM25 文本检索
+		SearchResponse<Document> bm25Response = elasticsearchClient.search(sr -> sr.index(indexName)
+			.postFilter(filter)
+			.size(windowSize)
+			.query(q -> q.match(mq -> mq.field("content").query(escape(text)))), Document.class);
+		List<Document> bm25Docs = bm25Response.hits()
+			.hits()
+			.stream()
+			.map(this::toDocument)
+			.collect(Collectors.toList());
+
+		return List.of(knnDocs, bm25Docs);
 	}
 
 	private Document toDocument(Hit<Document> hit) {

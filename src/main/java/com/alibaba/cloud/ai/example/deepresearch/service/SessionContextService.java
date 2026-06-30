@@ -24,14 +24,14 @@ import java.util.List;
 /**
  * 会话上下文服务接口，定义会话与线程映射关系及历史报告管理的操作契约。
  *
- * <p>项目职责：抽象多轮对话的上下文存储行为，包括注册新历史记录、
- * 查询会话下所有 threadId、按 threadId 列表获取历史报告以及获取最近 N 条报告；
+ * <p>
+ * 项目职责：抽象多轮对话的上下文存储行为，包括注册新历史记录、 查询会话下所有 threadId、按 threadId 列表获取历史报告以及获取最近 N 条报告；
  * 与存储介质解耦，实现可按需替换。
  *
- * <p>被使用情况：由 {@link InMemorySessionContextService} 实现（默认）；
- * 被 {@code ReporterNode} 在生成报告后写入历史，被 {@code CoordinatorNode} 和
- * {@code BackgroundInvestigationNode} 读取历史上下文；
- * 也通过 {@code DeepResearchConfiguration} 注入节点。
+ * <p>
+ * 被使用情况：由 {@link InMemorySessionContextService} 实现（默认）； 被 {@code ReporterNode}
+ * 在生成报告后写入历史，被 {@code CoordinatorNode} 和 {@code BackgroundInvestigationNode} 读取历史上下文； 也通过
+ * {@code DeepResearchConfiguration} 注入节点。
  *
  * @author vlsmb
  * @since 2025/8/6

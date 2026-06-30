@@ -1,0 +1,17 @@
+# ES-Hybrid 方案测试配置
+# 使用方式: --spring.profiles.active=test-es-hybrid
+spring:
+  ai:
+    alibaba:
+      deepresearch:
+        rag:
+          vector-store-type: elasticsearch
+          elasticsearch:
+            index-name: deepresearch-es-hybrid-test
+            hybrid:
+              enabled: true
+          pipeline:
+            rerank-enabled: false
+            query-expansion-enabled: false
+            query-translation-enabled: false
+            hypothetical-document-embedding-enabled: false

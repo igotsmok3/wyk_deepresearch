@@ -32,12 +32,13 @@ import java.util.stream.Collectors;
 /**
  * 基于 RRF（Reciprocal Rank Fusion）算法的融合与重排策略，公式为 score(doc) = Σ 1/(k + rank_i)。
  *
- * <p>项目职责：同时实现 FusionStrategy 和 DocumentPostProcessor 两个接口：
- * 作为 FusionStrategy 时将多路检索结果列表融合为单一排序列表；
- * 作为 DocumentPostProcessor 时按 source_type 分组后对单次检索结果执行 rerank，
- * 两者均支持 topK 截断和相似度阈值过滤。
+ * <p>
+ * 项目职责：同时实现 FusionStrategy 和 DocumentPostProcessor 两个接口： 作为 FusionStrategy
+ * 时将多路检索结果列表融合为单一排序列表； 作为 DocumentPostProcessor 时按 source_type 分组后对单次检索结果执行 rerank， 两者均支持
+ * topK 截断和相似度阈值过滤。
  *
- * <p>被使用情况：DefaultHybridRagProcessor 在 rerankEnabled=true 时注入并在 postProcess 阶段调用；
+ * <p>
+ * 被使用情况：DefaultHybridRagProcessor 在 rerankEnabled=true 时注入并在 postProcess 阶段调用；
  * RagNodeService 将本类作为 FusionStrategy 注入到 RagNode 中用于多策略结果融合。
  *
  * @author hupei
@@ -74,7 +75,8 @@ public class RrfFusionStrategy implements FusionStrategy, DocumentPostProcessor 
 			return results.get(0); // 如果只有一个结果列表，无需融合
 		}
 
-		return fuseInternal(results, defaultTopK, defaultThreshold);
+		// fuse() 用于跨路列表合并，不做阈值截断（RRF 分数本身很小，阈值过滤属 rerank 语义）
+		return fuseInternal(results, defaultTopK, 0.0);
 	}
 
 	@Override
@@ -91,9 +93,7 @@ public class RrfFusionStrategy implements FusionStrategy, DocumentPostProcessor 
 	}
 
 	/**
-	 * 内部融合核心逻辑：
-	 * 1. 遍历每个结果列表，按排名计算每个文档的 RRF 累加分
-	 * 2. 按分数降序排列，过滤低于 threshold 的文档，截取 topK 条返回
+	 * 内部融合核心逻辑： 1. 遍历每个结果列表，按排名计算每个文档的 RRF 累加分 2. 按分数降序排列，过滤低于 threshold 的文档，截取 topK 条返回
 	 */
 	private List<Document> fuseInternal(List<List<Document>> results, int topK, double threshold) {
 		if (results == null || results.isEmpty()) {

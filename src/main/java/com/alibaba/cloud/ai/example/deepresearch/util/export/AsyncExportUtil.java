@@ -26,10 +26,12 @@ import java.util.concurrent.CompletableFuture;
 /**
  * 异步导出工具类，以线程池异步方式将报告内容转换并保存为 PDF 文件。
  *
- * <p>项目职责：封装异步 PDF 生成逻辑，避免 PDF 渲染（字体加载 + openhtmltopdf 渲染）阻塞主流程；
- * 内部依赖 {@link FileOperationUtil} 生成文件名，依赖 {@link FormatConversionUtil} 执行 Markdown→PDF 转换。
+ * <p>
+ * 项目职责：封装异步 PDF 生成逻辑，避免 PDF 渲染（字体加载 + openhtmltopdf 渲染）阻塞主流程； 内部依赖
+ * {@link FileOperationUtil} 生成文件名，依赖 {@link FormatConversionUtil} 执行 Markdown→PDF 转换。
  *
- * <p>被使用情况：静态工具方法，按需调用；目前在 ExportService 的导出流程中可作为异步替代入口使用。
+ * <p>
+ * 被使用情况：静态工具方法，按需调用；目前在 ExportService 的导出流程中可作为异步替代入口使用。
  *
  * @author sixiyida
  * @since 2025/6/20

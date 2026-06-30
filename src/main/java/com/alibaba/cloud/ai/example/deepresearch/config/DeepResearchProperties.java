@@ -28,11 +28,13 @@ import java.util.Set;
 /**
  * DeepResearch 全局配置属性类，绑定 {@code spring.ai.alibaba.deepresearch.*} 前缀的配置项。
  *
- * <p>项目职责：属于配置层，作为整个 DeepResearch 模块的顶层配置入口，提供并行节点数量、
- * MCP 客户端映射、图最大迭代次数以及可用搜索引擎列表等核心参数。
- * 各子模块配置类（如 {@code RagProperties}、{@code ReflectionProperties} 等）的前缀常量均基于本类的 {@code PREFIX} 派生。
+ * <p>
+ * 项目职责：属于配置层，作为整个 DeepResearch 模块的顶层配置入口，提供并行节点数量、 MCP 客户端映射、图最大迭代次数以及可用搜索引擎列表等核心参数。
+ * 各子模块配置类（如 {@code RagProperties}、{@code ReflectionProperties} 等）的前缀常量均基于本类的
+ * {@code PREFIX} 派生。
  *
- * <p>被使用情况：被 {@code DeepResearchConfiguration}、{@code ChatController}、
+ * <p>
+ * 被使用情况：被 {@code DeepResearchConfiguration}、{@code ChatController}、
  * {@code ParallelExecutorNode}、{@code SearchBeanUtil} 等多处注入，用于控制并行度、图执行上限和搜索策略。
  *
  * @author sixiyida

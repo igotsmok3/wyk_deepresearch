@@ -1,0 +1,19 @@
+# Milvus-ES 方案测试配置
+# 使用方式: --spring.profiles.active=test-milvus-es
+spring:
+  ai:
+    alibaba:
+      deepresearch:
+        rag:
+          vector-store-type: milvus-es
+          milvus:
+            collection-name: deepresearch_milvus_es_test
+          elasticsearch:
+            index-name: deepresearch-milvus-es-test
+            hybrid:
+              enabled: false
+          pipeline:
+            rerank-enabled: false
+            query-expansion-enabled: false
+            query-translation-enabled: false
+            hypothetical-document-embedding-enabled: false

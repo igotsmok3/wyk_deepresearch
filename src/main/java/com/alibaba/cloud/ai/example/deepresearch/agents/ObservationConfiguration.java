@@ -34,12 +34,14 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 可观测性配置类，负责注册工具调用（ToolCalling）的观测处理器和 {@link ObservationRegistry}。
  *
- * <p>项目职责：属于配置层，在 {@code spring.ai.alibaba.deepresearch.observation.enabled=true}（默认启用）时生效。
- * 注册 {@code ObservationHandler<ToolCallingObservationContext>}，在工具调用开始和结束时打印日志，
- * 并在容器中尚无 {@code observationRegistry} Bean 时创建默认实例，支持对 AI 工具调用行为进行监控与追踪。
+ * <p>
+ * 项目职责：属于配置层，在 {@code spring.ai.alibaba.deepresearch.observation.enabled=true}（默认启用）时生效。
+ * 注册 {@code ObservationHandler<ToolCallingObservationContext>}，在工具调用开始和结束时打印日志， 并在容器中尚无
+ * {@code observationRegistry} Bean 时创建默认实例，支持对 AI 工具调用行为进行监控与追踪。
  *
- * <p>被使用情况：由 Spring 容器直接管理；其创建的 {@code ObservationRegistry} Bean 被
- * {@code ChatController} 通过 {@code ObjectProvider} 注入使用。
+ * <p>
+ * 被使用情况：由 Spring 容器直接管理；其创建的 {@code ObservationRegistry} Bean 被 {@code ChatController} 通过
+ * {@code ObjectProvider} 注入使用。
  *
  * @author Allen Hu
  * @since 0.1.0
